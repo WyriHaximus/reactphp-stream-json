@@ -1,6 +1,6 @@
 {
     "name": "wyrihaximus/react-stream-json",
-    "description": "Base64 stream encoders/decoders for ReactPHP",
+    "description": "Incremental JSON encoder writing to a react/stream",
     "license": "MIT",
     "authors": [
         {
