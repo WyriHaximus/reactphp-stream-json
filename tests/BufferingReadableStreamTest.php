@@ -4,14 +4,14 @@ namespace WyriHaximus\React\Tests\Stream\JSON;
 
 use PHPUnit\Framework\TestCase;
 use React\Stream\ThroughStream;
-use WyriHaximus\React\Stream\JSON\BufferingStream;
+use WyriHaximus\React\Stream\JSON\BufferingReadableStream;
 
-final class BufferingStreamTest extends TestCase
+final class BufferingReadableStreamTest extends TestCase
 {
     public function testBuffering()
     {
         $stream = new ThroughStream();
-        $bufferingStream = new BufferingStream($stream);
+        $bufferingStream = new BufferingReadableStream($stream);
 
         self::assertFalse($bufferingStream->isDone());
 
@@ -35,7 +35,7 @@ final class BufferingStreamTest extends TestCase
     public function testBufferingStreamClose()
     {
         $stream = new ThroughStream();
-        $bufferingStream = new BufferingStream($stream);
+        $bufferingStream = new BufferingReadableStream($stream);
 
         self::assertFalse($bufferingStream->isDone());
 
