@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace WyriHaximus\React\Stream\JSON;
+namespace WyriHaximus\React\Stream\Json;
 
 use React\Stream\ReadableStreamInterface;
 

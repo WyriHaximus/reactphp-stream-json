@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "WyriHaximus\\React\\Stream\\JSON\\": "src/"
+            "WyriHaximus\\React\\Stream\\Json\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "WyriHaximus\\React\\Tests\\Stream\\JSON\\": "tests/"
+            "WyriHaximus\\React\\Tests\\Stream\\Json\\": "tests/"
         }
     },
     "config": {

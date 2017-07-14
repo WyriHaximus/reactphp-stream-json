@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace WyriHaximus\React\Tests\Stream\JSON;
+namespace WyriHaximus\React\Tests\Stream\Json;
 
 use PHPUnit\Framework\TestCase;
 use React\Stream\ThroughStream;
-use WyriHaximus\React\Stream\JSON\BufferingReadableStream;
+use WyriHaximus\React\Stream\Json\BufferingReadableStream;
 
 final class BufferingReadableStreamTest extends TestCase
 {
