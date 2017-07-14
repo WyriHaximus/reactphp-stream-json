@@ -4,12 +4,12 @@ namespace WyriHaximus\React\Stream\Json;
 
 use React\Stream\ReadableStreamInterface;
 
-final class BufferingWritableJsonStream extends AbstractBufferingStream
+final class BufferingJsonStream extends AbstractBufferingStream
 {
     /**
      * @param ReadableStreamInterface $stream
      */
-    public function __construct(WritableJsonStream $stream)
+    public function __construct(JsonStream $stream)
     {
         $this->setUp($stream);
     }
