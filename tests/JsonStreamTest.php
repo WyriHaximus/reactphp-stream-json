@@ -44,8 +44,8 @@ final class JsonStreamTest extends TestCase
 
         yield [function () {
             $input = [
-            'a' => 'b',
-            'c' => 'd',
+                'a' => 'b',
+                'c' => 'd',
             ];
 
             return [$input, '{"a":"b","c":"d"}'];
@@ -53,8 +53,8 @@ final class JsonStreamTest extends TestCase
 
         yield [function () {
             $input = [
-            'a' => resolve('b'),
-            'c' => resolve('d'),
+                'a' => resolve('b'),
+                'c' => resolve('d'),
             ];
 
             return [$input, '{"a":"b","c":"d"}'];
