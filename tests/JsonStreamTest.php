@@ -170,6 +170,27 @@ final class JsonStreamTest extends TestCase
 
             return [$input, '{"river":"song","melody":"by the pond","from":"the vortex","vortex":{"ponds":{"f":"the girl who waited","m":"the last centurion"}}}'];
         }];
+
+        yield [function (LoopInterface $loop) {
+            $stream = new ThroughStream();
+
+            $input = [
+                'a' => resolve([
+                    'b' => resolve([
+                        'c' => resolve([
+                            'd' => resolve(resolve(resolve(resolve(resolve($stream))))),
+                        ]),
+                    ]),
+                ]),
+            ];
+
+            $loop->addTimer(0.1, function () use ($stream) {
+                $stream->end('e');
+            });
+
+            return [$input, '{"a":{"b":{"c":{"d":"e"}}}}'];
+        }];
+
     }
 
     /**
