@@ -191,6 +191,25 @@ final class JsonStreamTest extends TestCase
             return [$input, '{"a":{"b":{"c":{"d":"e"}}}}'];
         }];
 
+        yield [function (LoopInterface $loop) {
+            $stream = new ThroughStream();
+
+            $input = [
+                'a' => resolve([
+                    'b' => [
+                        'c' => resolve([
+                            'd' => resolve(resolve(resolve(resolve(resolve($stream))))),
+                        ]),
+                    ],
+                ]),
+            ];
+
+            $loop->addTimer(0.1, function () use ($stream) {
+                $stream->end('e');
+            });
+
+            return [$input, '{"a":{"b":{"c":{"d":"e"}}}}'];
+        }];
     }
 
     /**
