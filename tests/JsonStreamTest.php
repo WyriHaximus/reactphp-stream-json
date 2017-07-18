@@ -396,4 +396,24 @@ final class JsonStreamTest extends TestCase
         json_decode($buffer, true);
         self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
     }
+
+    public function testDoubleKeys()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createObject();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->write('a', true);
+            $stream->write('a', false);
+            $stream->end();
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('{"a":true,"a":false}', $buffer);
+        $json = json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        self::assertSame(['a' => false], $json);
+    }
 }
