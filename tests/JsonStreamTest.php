@@ -328,4 +328,72 @@ final class JsonStreamTest extends TestCase
         json_decode($buffer, true);
         self::assertSame(JSON_ERROR_NONE, json_last_error());
     }
+
+    public function testForceArray()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createArray();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->end([true, false]);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('[true,false]', $buffer);
+        json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+    }
+
+    public function testForceArrayWhileWeWriteAnObject()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createArray();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->end(['a' => true, 'b' => false]);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('["a":true,"b":false]', $buffer);
+        json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
+    }
+
+    public function testForceObject()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createObject();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->end(['a' => true, 'b' => false]);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('{"a":true,"b":false}', $buffer);
+        json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+    }
+
+    public function testForceObjectWhileWeWriteAnArray()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createObject();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->end([true, false]);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('{true,false}', $buffer);
+        json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
+    }
 }

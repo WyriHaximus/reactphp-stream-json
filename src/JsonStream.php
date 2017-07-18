@@ -39,6 +39,11 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     private $first = true;
 
     /**
+     * @var bool
+     */
+    private $typeDetected = false;
+
+    /**
      * @var int
      */
     private $i = 0;
@@ -61,6 +66,22 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     public function __construct()
     {
         $this->queue = new SplQueue();
+    }
+
+    public static function createArray(): JsonStream
+    {
+        $self = new self();
+        $self->typeDetected = true;
+        $self->beginning = self::ARRAY_BEGINNING;
+        $self->ending = self::ARRAY_ENDING;
+        return $self;
+    }
+
+    public static function createObject(): JsonStream
+    {
+        $self = new self();
+        $self->typeDetected = true;
+        return $self;
     }
 
     public function write(string $key, $value)
@@ -95,6 +116,8 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     public function writeArray(array $values)
     {
+        $this->objectOrArray($values);
+
         foreach ($values as $key => $value) {
             if (is_string($key)) {
                 $this->write($key, $value);
@@ -134,7 +157,6 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     public function end(array $values = null)
     {
         if (is_array($values)) {
-            $this->objectOrArray($values);
             $this->writeArray($values);
         }
 
@@ -150,6 +172,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     private function objectOrArray(array $values)
     {
         if (!$this->first) {
+            return;
+        }
+
+        if ($this->typeDetected) {
             return;
         }
 
@@ -170,6 +196,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         }
 
         if ($this->first) {
+            $this->typeDetected = true;
             $this->emitData($this->beginning);
         }
 
