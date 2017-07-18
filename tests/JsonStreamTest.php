@@ -210,6 +210,61 @@ final class JsonStreamTest extends TestCase
 
             return [$input, '{"a":{"b":{"c":{"d":"e"}}}}'];
         }];
+
+        yield [function () {
+            $input = range(1, 10);
+
+            return [$input, '[1,2,3,4,5,6,7,8,9,10]'];
+        }];
+
+        yield [function () {
+            $input = [
+                resolve(1),
+                resolve(2),
+                resolve(3),
+                resolve(4),
+                resolve(5),
+                resolve(6),
+                resolve(7),
+                resolve(8),
+                resolve(9),
+                resolve(10),
+            ];
+
+            return [$input, '[1,2,3,4,5,6,7,8,9,10]'];
+        }];
+
+        yield [function () {
+            $input = [
+                [
+                    'foo' => 'bar',
+                ],
+                [
+                    'bar' => 'foo',
+                ],
+            ];
+
+            return [$input, '[{"foo":"bar"},{"bar":"foo"}]'];
+        }];
+
+        yield [function (LoopInterface $loop) {
+            $stream = new ThroughStream();
+
+            $input = [
+                [
+                    'foo' => resolve('bar'),
+                ],
+                resolve([
+                    'bar' => $stream,
+                ]),
+            ];
+
+            $loop->addTimer(0.1, function () use ($stream) {
+                $stream->end('foo');
+            });
+
+            return [$input, '[{"foo":"bar"},{"bar":"foo"}]'];
+        }];
     }
 
     /**
