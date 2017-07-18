@@ -74,6 +74,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $self->typeDetected = true;
         $self->beginning = self::ARRAY_BEGINNING;
         $self->ending = self::ARRAY_ENDING;
+
         return $self;
     }
 
@@ -81,6 +82,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     {
         $self = new self();
         $self->typeDetected = true;
+
         return $self;
     }
 
