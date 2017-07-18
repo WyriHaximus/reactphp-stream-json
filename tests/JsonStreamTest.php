@@ -416,4 +416,84 @@ final class JsonStreamTest extends TestCase
         self::assertSame(JSON_ERROR_NONE, json_last_error());
         self::assertSame(['a' => false], $json);
     }
+
+    public function testNoMoreWriteAfterEnd()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createObject();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->write('a', true);
+            $stream->end();
+            $stream->write('b', false);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('{"a":true}', $buffer);
+        $json = json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        self::assertSame(['a' => true], $json);
+    }
+
+    public function testNoMoreWriteValueAfterEnd()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createObject();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->write('a', true);
+            $stream->end();
+            $stream->writeValue(false);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('{"a":true}', $buffer);
+        $json = json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        self::assertSame(['a' => true], $json);
+    }
+
+    public function testNoMoreWriteArrayAfterEnd()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createObject();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->write('a', true);
+            $stream->end();
+            $stream->writeArray([1,2,3,4,5,6,7,8,9,10]);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('{"a":true}', $buffer);
+        $json = json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        self::assertSame(['a' => true], $json);
+    }
+
+    public function testNoMoreEndAfterEnd()
+    {
+        $loop = Factory::create();
+
+        $stream = JsonStream::createObject();
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->write('a', true);
+            $stream->end();
+            $stream->end([1,2,3,4,5,6,7,8,9,10]);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('{"a":true}', $buffer);
+        $json = json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        self::assertSame(['a' => true], $json);
+    }
 }

@@ -88,6 +88,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     public function write(string $key, $value)
     {
+        if ($this->closing) {
+            return;
+        }
+
         $id = $this->i++;
 
         $value = $this->wrapValue($value);
@@ -103,6 +107,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     public function writeValue($value)
     {
+        if ($this->closing) {
+            return;
+        }
+
         $id = $this->i++;
 
         $value = $this->wrapValue($value);
@@ -118,6 +126,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     public function writeArray(array $values)
     {
+        if ($this->closing) {
+            return;
+        }
+
         $this->objectOrArray($values);
 
         foreach ($values as $key => $value) {
@@ -158,6 +170,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     public function end(array $values = null)
     {
+        if ($this->closing) {
+            return;
+        }
+
         if (is_array($values)) {
             $this->writeArray($values);
         }
