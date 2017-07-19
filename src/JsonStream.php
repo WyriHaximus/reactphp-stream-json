@@ -63,6 +63,16 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
      */
     private $readable = true;
 
+    /**
+     * @var bool
+     */
+    private $paused = false;
+
+    /**
+     * @var string
+     */
+    private $buffer = '';
+
     public function __construct()
     {
         $this->queue = new SplQueue();
@@ -147,20 +157,16 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return $this->readable;
     }
 
-    /**
-     * @deprecated Not going to be implemented
-     */
     public function pause()
     {
-        // No-op
+        $this->paused = true;
     }
 
-    /**
-     * @deprecated Not going to be implemented
-     */
     public function resume()
     {
-        // No-op
+        $this->paused = false;
+        $this->emitData($this->buffer);
+        $this->buffer = '';
     }
 
     public function pipe(WritableStreamInterface $dest, array $options = [])
@@ -320,6 +326,12 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     private function emitData(string $data)
     {
+        if ($this->paused) {
+            $this->buffer .= $data;
+
+            return;
+        }
+
         $this->emit('data', [$data]);
     }
 }

@@ -496,4 +496,50 @@ final class JsonStreamTest extends TestCase
         self::assertSame(JSON_ERROR_NONE, json_last_error());
         self::assertSame(['a' => true], $json);
     }
+
+    public function testPauseResume()
+    {
+        $stream = JsonStream::createObject();
+
+        $shouldntBeCalledCount = 0;
+        $shouldntBeCalled = function () use (&$shouldntBeCalledCount) {
+            $shouldntBeCalledCount++;
+        };
+        $shouldBeCalledCount = 0;
+        $shouldBeCalled = function () use (&$shouldBeCalledCount) {
+            $shouldBeCalledCount++;
+        };
+
+        self::assertSame(0, $shouldntBeCalledCount);
+        self::assertSame(0, $shouldBeCalledCount);
+
+        $stream->on('data', $shouldntBeCalled);
+        $stream->pause();
+
+        $stream->write('key', 'value');
+
+        self::assertSame(0, $shouldntBeCalledCount);
+        self::assertSame(0, $shouldBeCalledCount);
+
+        $stream->removeListener('data', $shouldntBeCalled);
+        $stream->on('data', $shouldBeCalled);
+
+        self::assertSame(0, $shouldntBeCalledCount);
+        self::assertSame(0, $shouldBeCalledCount);
+
+        $stream->resume();
+
+        self::assertSame(0, $shouldntBeCalledCount);
+        self::assertSame(1, $shouldBeCalledCount);
+
+        $stream->write('key', 'value');
+
+        self::assertSame(0, $shouldntBeCalledCount);
+        self::assertSame(4, $shouldBeCalledCount);
+
+        $stream->end();
+
+        self::assertSame(0, $shouldntBeCalledCount);
+        self::assertSame(5, $shouldBeCalledCount);
+    }
 }
