@@ -265,6 +265,34 @@ final class JsonStreamTest extends TestCase
 
             return [$input, '[{"foo":"bar"},{"bar":"foo"}]'];
         }];
+
+        yield [function (LoopInterface $loop) {
+            $stream = new ThroughStream();
+
+            $input = [
+                '😱' => $stream,
+            ];
+
+            $loop->addTimer(0.05, function () use ($stream) {
+                $stream->end('😱');
+            });
+
+            return [$input, '{"\ud83d\ude31":"\ud83d\ude31"}'];
+        }];
+
+        yield [function (LoopInterface $loop) {
+            $stream = new ThroughStream();
+
+            $input = [
+                '😱' => $stream,
+            ];
+
+            $loop->addTimer(0.05, function () use ($stream) {
+                $stream->end('<\'&"&\'>');
+            });
+
+            return [$input, '{"\ud83d\ude31":"\u003C\u0027\u0026\u0022\u0026\u0027\u003E"}'];
+        }];
     }
 
     /**

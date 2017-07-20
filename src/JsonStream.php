@@ -246,7 +246,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->currentId = $item['id'];
 
         if ($item['key'] !== null) {
-            $this->emitData('"' . $item['key'] . '":');
+            $this->emitData($this->encode($item['key']) . ':');
         }
         $this->formatValue($item['value'])->done(function () {
             $this->currentId = null;
@@ -285,28 +285,26 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             });
         }
 
+        if ($value instanceof BufferingJsonStream) {
+            return $this->handleJsonStream($value);
+        }
+
         if ($value instanceof BufferingStreamInterface) {
             return $this->handleStream($value);
         }
 
-        $this->emitData(json_encode($value));
+        $this->emitData($this->encode($value));
 
         return resolve();
     }
 
-    private function handleStream(BufferingStreamInterface $bufferingStream): PromiseInterface
+    private function handleJsonStream(BufferingStreamInterface $bufferingStream): PromiseInterface
     {
         $isDone = $bufferingStream->isDone();
         $stream = $bufferingStream->takeOverStream();
-        if (!($bufferingStream instanceof BufferingJsonStream)) {
-            $this->emitData('"');
-        }
-        $this->emitData($bufferingStream->takeOverBuffer());
+        $buffer = $bufferingStream->takeOverBuffer();
+        $this->emitData($buffer);
         if ($isDone) {
-            if (!($bufferingStream instanceof BufferingJsonStream)) {
-                $this->emitData('"');
-            }
-
             return resolve();
         }
 
@@ -314,10 +312,31 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             $this->emitData($data);
         });
         $deferred = new Deferred();
-        $stream->once('close', function () use ($deferred, $bufferingStream) {
-            if (!($bufferingStream instanceof BufferingJsonStream)) {
-                $this->emitData('"');
-            }
+        $stream->once('close', function () use ($deferred) {
+            $deferred->resolve();
+        });
+
+        return $deferred->promise();
+    }
+
+    private function handleStream(BufferingStreamInterface $bufferingStream): PromiseInterface
+    {
+        $isDone = $bufferingStream->isDone();
+        $stream = $bufferingStream->takeOverStream();
+        $this->emitData('"');
+        $buffer = $bufferingStream->takeOverBuffer();
+        $this->emitData($this->encode($buffer, true));
+        if ($isDone) {
+            $this->emitData('"');
+            return resolve();
+        }
+
+        $stream->on('data', function ($data) {
+            $this->emitData($this->encode($data, true));
+        });
+        $deferred = new Deferred();
+        $stream->once('close', function () use ($deferred) {
+            $this->emitData('"');
             $deferred->resolve();
         });
 
@@ -333,5 +352,19 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         }
 
         $this->emit('data', [$data]);
+    }
+
+    private function encode($value, bool $stripWrappingQuotes = false): string
+    {
+        $json = json_encode(
+            $value,
+            JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_PRESERVE_ZERO_FRACTION
+        );
+
+        if (!$stripWrappingQuotes) {
+            return $json;
+        }
+
+        return trim($json, '"');
     }
 }
