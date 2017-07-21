@@ -322,6 +322,24 @@ final class JsonStreamTest extends TestCase
         self::assertSame(json_decode($output, true), $json);
     }
 
+    public function testEncodeFlags()
+    {
+        $loop = Factory::create();
+
+        $stream = new JsonStream(0);
+
+        $loop->addTimer(0.01, function () use ($stream) {
+            $stream->end(['<\'&"&\'>']);
+        });
+
+        $buffer = await(buffer($stream), $loop, 6);
+
+        self::assertSame('["<\'&\"&\'>"]', $buffer);
+        $json = json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        self::assertSame(['<\'&"&\'>'], $json);
+    }
+
     public function testObjectOrArrayObject()
     {
         $loop = Factory::create();
