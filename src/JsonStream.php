@@ -196,6 +196,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     public function close()
     {
+        if ($this->closing === true) {
+            return;
+        }
+
         $this->closing = true;
         $this->nextItem();
     }
