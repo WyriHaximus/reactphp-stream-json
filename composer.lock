@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "19374a7fb1acbb13583422089b43cd74",
+    "content-hash": "0b0cfa7cdc4d940cdf50b3639b6d350f",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -1510,16 +1510,16 @@
         },
         {
             "name": "react/promise-stream",
-            "version": "v0.1.1",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise-stream.git",
-                "reference": "45eaf9f20247fb1113b714b39d7b9e4bde733b60"
+                "reference": "1503761d01116bf893f86b9843b3bc7a80682587"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise-stream/zipball/45eaf9f20247fb1113b714b39d7b9e4bde733b60",
-                "reference": "45eaf9f20247fb1113b714b39d7b9e4bde733b60",
+                "url": "https://api.github.com/repos/reactphp/promise-stream/zipball/1503761d01116bf893f86b9843b3bc7a80682587",
+                "reference": "1503761d01116bf893f86b9843b3bc7a80682587",
                 "shasum": ""
             },
             "require": {
@@ -1552,7 +1552,7 @@
                     "email": "christian@lueck.tv"
                 }
             ],
-            "description": "The missing link between Promise-land and Stream-land for React PHP",
+            "description": "The missing link between Promise-land and Stream-land for ReactPHP",
             "homepage": "https://github.com/reactphp/promise-stream",
             "keywords": [
                 "Buffer",
@@ -1562,7 +1562,7 @@
                 "stream",
                 "unwrap"
             ],
-            "time": "2017-05-15T19:37:05+00:00"
+            "time": "2017-10-24T14:35:40+00:00"
         },
         {
             "name": "react/promise-timer",
