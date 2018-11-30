@@ -6,9 +6,12 @@ use PHPUnit\Framework\TestCase;
 use React\Stream\ThroughStream;
 use WyriHaximus\React\Stream\Json\BufferingReadableStream;
 
+/**
+ * @internal
+ */
 final class BufferingReadableStreamTest extends TestCase
 {
-    public function testBuffering()
+    public function testBuffering(): void
     {
         $stream = new ThroughStream();
         $bufferingStream = new BufferingReadableStream($stream);
@@ -32,7 +35,7 @@ final class BufferingReadableStreamTest extends TestCase
         self::assertTrue($bufferingStream->isDone());
     }
 
-    public function testBufferingStreamClose()
+    public function testBufferingStreamClose(): void
     {
         $stream = new ThroughStream();
         $bufferingStream = new BufferingReadableStream($stream);

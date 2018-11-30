@@ -1,18 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
-use function Clue\React\Block\await;
 use React\EventLoop\Factory;
-use function React\Promise\resolve;
-use function React\Promise\Stream\buffer;
 use React\Stream\ThroughStream;
 use WyriHaximus\React\Stream\Json\JsonStream;
+use function Clue\React\Block\await;
+use function React\Promise\resolve;
+use function React\Promise\Stream\buffer;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+require \dirname(__DIR__) . '/vendor/autoload.php';
 
 $loop = Factory::create();
 $jsonStream = new JsonStream();
 
-$loop->futureTick(function () use ($jsonStream) {
+$loop->futureTick(function () use ($jsonStream): void {
     $stream = new ThroughStream();
     $anotherStream = new ThroughStream();
 

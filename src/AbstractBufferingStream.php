@@ -24,7 +24,7 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
     /**
      * @param ReadableStreamInterface $stream
      */
-    protected function setUp(ReadableStreamInterface $stream)
+    protected function setUp(ReadableStreamInterface $stream): void
     {
         $this->stream = $stream;
         $this->stream->on('data', [$this, 'onData']);
@@ -35,7 +35,7 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
      * @internal
      * @param mixed $data
      */
-    public function onData($data)
+    public function onData($data): void
     {
         $this->buffer .= $data;
     }
@@ -43,7 +43,7 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
     /**
      * @internal
      */
-    public function onClose()
+    public function onClose(): void
     {
         $this->isDone = true;
     }

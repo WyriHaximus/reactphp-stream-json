@@ -103,7 +103,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return $self;
     }
 
-    public function write(string $key, $value)
+    public function write(string $key, $value): void
     {
         if ($this->closing) {
             return;
@@ -122,7 +122,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->nextItem();
     }
 
-    public function writeValue($value)
+    public function writeValue($value): void
     {
         if ($this->closing) {
             return;
@@ -141,7 +141,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->nextItem();
     }
 
-    public function writeArray(array $values)
+    public function writeArray(array $values): void
     {
         if ($this->closing) {
             return;
@@ -150,7 +150,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->objectOrArray($values);
 
         foreach ($values as $key => $value) {
-            if (is_string($key)) {
+            if (\is_string($key)) {
                 $this->write($key, $value);
                 continue;
             }
@@ -164,12 +164,12 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return $this->readable;
     }
 
-    public function pause()
+    public function pause(): void
     {
         $this->paused = true;
     }
 
-    public function resume()
+    public function resume(): void
     {
         $this->paused = false;
         $this->emitData($this->buffer);
@@ -181,20 +181,20 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return Util::pipe($this, $dest, $options);
     }
 
-    public function end(array $values = null)
+    public function end(array $values = null): void
     {
         if ($this->closing) {
             return;
         }
 
-        if (is_array($values)) {
+        if (\is_array($values)) {
             $this->writeArray($values);
         }
 
         $this->close();
     }
 
-    public function close()
+    public function close(): void
     {
         if ($this->closing === true) {
             return;
@@ -204,7 +204,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->nextItem();
     }
 
-    private function objectOrArray(array $values)
+    private function objectOrArray(array $values): void
     {
         if (!$this->first) {
             return;
@@ -215,7 +215,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         }
 
         foreach ($values as $key => $value) {
-            if (is_string($key)) {
+            if (\is_string($key)) {
                 return;
             }
         }
@@ -224,7 +224,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->ending = self::ARRAY_ENDING;
     }
 
-    private function nextItem()
+    private function nextItem(): void
     {
         if ($this->currentId !== null) {
             return;
@@ -259,7 +259,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         if ($item['key'] !== null) {
             $this->emitData($this->encode($item['key']) . ':');
         }
-        $this->formatValue($item['value'])->done(function () {
+        $this->formatValue($item['value'])->done(function (): void {
             $this->currentId = null;
             $this->nextItem();
         });
@@ -275,7 +275,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             return new BufferingReadableStream($value);
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $json = new self();
             $bufferingStream = new BufferingJsonStream($json);
             $json->end($value);
@@ -319,11 +319,11 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             return resolve();
         }
 
-        $stream->on('data', function ($data) {
+        $stream->on('data', function ($data): void {
             $this->emitData($data);
         });
         $deferred = new Deferred();
-        $stream->once('close', function () use ($deferred) {
+        $stream->once('close', function () use ($deferred): void {
             $deferred->resolve();
         });
 
@@ -343,11 +343,11 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             return resolve();
         }
 
-        $stream->on('data', function ($data) {
+        $stream->on('data', function ($data): void {
             $this->emitData($this->encode($data, true));
         });
         $deferred = new Deferred();
-        $stream->once('close', function () use ($deferred) {
+        $stream->once('close', function () use ($deferred): void {
             $this->emitData('"');
             $deferred->resolve();
         });
@@ -355,7 +355,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return $deferred->promise();
     }
 
-    private function emitData(string $data)
+    private function emitData(string $data): void
     {
         if ($this->paused) {
             $this->buffer .= $data;
@@ -368,7 +368,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     private function encode($value, bool $stripWrappingQuotes = false): string
     {
-        $json = json_encode(
+        $json = \json_encode(
             $value,
             $this->encodeFlags
         );
@@ -377,6 +377,6 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             return $json;
         }
 
-        return trim($json, '"');
+        return \trim($json, '"');
     }
 }

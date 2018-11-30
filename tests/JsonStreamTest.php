@@ -13,6 +13,9 @@ use function React\Promise\all;
 use function React\Promise\resolve;
 use function React\Promise\Stream\buffer;
 
+/**
+ * @internal
+ */
 final class JsonStreamTest extends TestCase
 {
     public function provideJSONs()
@@ -76,7 +79,7 @@ final class JsonStreamTest extends TestCase
                 'river' => $stream,
             ];
 
-            $loop->addTimer(0.05, function () use ($stream) {
+            $loop->addTimer(0.05, function () use ($stream): void {
                 $stream->end('song');
             });
 
@@ -92,11 +95,11 @@ final class JsonStreamTest extends TestCase
                 'melody' => $streamB,
             ];
 
-            $loop->addTimer(0.1, function () use ($streamA) {
+            $loop->addTimer(0.1, function () use ($streamA): void {
                 $streamA->end('song');
             });
 
-            $loop->addTimer(0.05, function () use ($streamB) {
+            $loop->addTimer(0.05, function () use ($streamB): void {
                 $streamB->end('by the pond');
             });
 
@@ -114,15 +117,15 @@ final class JsonStreamTest extends TestCase
                 'from' => $deferred->promise(),
             ];
 
-            $loop->addTimer(0.1, function () use ($streamA) {
+            $loop->addTimer(0.1, function () use ($streamA): void {
                 $streamA->end('song');
             });
 
-            $loop->addTimer(0.05, function () use ($streamB) {
+            $loop->addTimer(0.05, function () use ($streamB): void {
                 $streamB->end('by the pond');
             });
 
-            $loop->addTimer(0.01, function () use ($deferred) {
+            $loop->addTimer(0.01, function () use ($deferred): void {
                 $deferred->resolve('the vortex');
             });
 
@@ -143,19 +146,19 @@ final class JsonStreamTest extends TestCase
                 'vortex' => $jsonStream,
             ];
 
-            $loop->addTimer(0.1, function () use ($streamA) {
+            $loop->addTimer(0.1, function () use ($streamA): void {
                 $streamA->end('song');
             });
 
-            $loop->addTimer(0.05, function () use ($streamB) {
+            $loop->addTimer(0.05, function () use ($streamB): void {
                 $streamB->end('by the pond');
             });
 
-            $loop->addTimer(0.01, function () use ($deferred) {
+            $loop->addTimer(0.01, function () use ($deferred): void {
                 $deferred->resolve('the vortex');
             });
 
-            $loop->addTimer(0.05, function () use ($jsonStream, $streamCenturion) {
+            $loop->addTimer(0.05, function () use ($jsonStream, $streamCenturion): void {
                 $jsonStream->end([
                     'ponds' => resolve([
                         'f' => resolve(resolve(resolve('the girl who waited'))),
@@ -164,7 +167,7 @@ final class JsonStreamTest extends TestCase
                 ]);
             });
 
-            $loop->addTimer(0.1, function () use ($streamCenturion) {
+            $loop->addTimer(0.1, function () use ($streamCenturion): void {
                 $streamCenturion->end('the last centurion');
             });
 
@@ -184,7 +187,7 @@ final class JsonStreamTest extends TestCase
                 ]),
             ];
 
-            $loop->addTimer(0.1, function () use ($stream) {
+            $loop->addTimer(0.1, function () use ($stream): void {
                 $stream->end('e');
             });
 
@@ -204,7 +207,7 @@ final class JsonStreamTest extends TestCase
                 ]),
             ];
 
-            $loop->addTimer(0.1, function () use ($stream) {
+            $loop->addTimer(0.1, function () use ($stream): void {
                 $stream->end('e');
             });
 
@@ -212,7 +215,7 @@ final class JsonStreamTest extends TestCase
         }];
 
         yield [function () {
-            $input = range(1, 10);
+            $input = \range(1, 10);
 
             return [$input, '[1,2,3,4,5,6,7,8,9,10]'];
         }];
@@ -259,7 +262,7 @@ final class JsonStreamTest extends TestCase
                 ]),
             ];
 
-            $loop->addTimer(0.1, function () use ($stream) {
+            $loop->addTimer(0.1, function () use ($stream): void {
                 $stream->end('foo');
             });
 
@@ -273,7 +276,7 @@ final class JsonStreamTest extends TestCase
                 '😱' => $stream,
             ];
 
-            $loop->addTimer(0.05, function () use ($stream) {
+            $loop->addTimer(0.05, function () use ($stream): void {
                 $stream->end('😱');
             });
 
@@ -287,7 +290,7 @@ final class JsonStreamTest extends TestCase
                 '😱' => $stream,
             ];
 
-            $loop->addTimer(0.05, function () use ($stream) {
+            $loop->addTimer(0.05, function () use ($stream): void {
                 $stream->end('<\'&"&\'>');
             });
 
@@ -298,7 +301,7 @@ final class JsonStreamTest extends TestCase
     /**
      * @dataProvider provideJSONs
      */
-    public function testStream(callable $args)
+    public function testStream(callable $args): void
     {
         $loop = Factory::create();
         list($input, $output) = $args($loop);
@@ -309,44 +312,44 @@ final class JsonStreamTest extends TestCase
 
         $stream->pipe($throughStream);
 
-        $loop->addTimer(0.01, function () use ($stream, $input) {
+        $loop->addTimer(0.01, function () use ($stream, $input): void {
             $stream->end($input);
         });
 
         $buffer = await(buffer($throughStream), $loop, 6);
 
         self::assertSame($output, $buffer);
-        $json = json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        $json = \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
         self::assertInternalType('array', $json);
-        self::assertSame(json_decode($output, true), $json);
+        self::assertSame(\json_decode($output, true), $json);
     }
 
-    public function testEncodeFlags()
+    public function testEncodeFlags(): void
     {
         $loop = Factory::create();
 
         $stream = new JsonStream(0);
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->end(['<\'&"&\'>']);
         });
 
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('["<\'&\"&\'>"]', $buffer);
-        $json = json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        $json = \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['<\'&"&\'>'], $json);
     }
 
-    public function testObjectOrArrayObject()
+    public function testObjectOrArrayObject(): void
     {
         $loop = Factory::create();
 
         $stream = new JsonStream();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->writeValue(true);
             $stream->end([false]);
         });
@@ -354,102 +357,102 @@ final class JsonStreamTest extends TestCase
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{true,false}', $buffer);
-        json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
+        \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_SYNTAX, \json_last_error());
     }
 
-    public function testObjectOrArrayArray()
+    public function testObjectOrArrayArray(): void
     {
         $loop = Factory::create();
 
         $stream = new JsonStream();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->end([true, false]);
         });
 
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('[true,false]', $buffer);
-        json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
     }
 
-    public function testForceArray()
+    public function testForceArray(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createArray();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->end([true, false]);
         });
 
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('[true,false]', $buffer);
-        json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
     }
 
-    public function testForceArrayWhileWeWriteAnObject()
+    public function testForceArrayWhileWeWriteAnObject(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createArray();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->end(['a' => true, 'b' => false]);
         });
 
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('["a":true,"b":false]', $buffer);
-        json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
+        \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_SYNTAX, \json_last_error());
     }
 
-    public function testForceObject()
+    public function testForceObject(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createObject();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->end(['a' => true, 'b' => false]);
         });
 
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{"a":true,"b":false}', $buffer);
-        json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
     }
 
-    public function testForceObjectWhileWeWriteAnArray()
+    public function testForceObjectWhileWeWriteAnArray(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createObject();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->end([true, false]);
         });
 
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{true,false}', $buffer);
-        json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
+        \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_SYNTAX, \json_last_error());
     }
 
-    public function testDoubleKeys()
+    public function testDoubleKeys(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createObject();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->write('a', true);
             $stream->write('a', false);
             $stream->end();
@@ -458,18 +461,18 @@ final class JsonStreamTest extends TestCase
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{"a":true,"a":false}', $buffer);
-        $json = json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        $json = \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => false], $json);
     }
 
-    public function testNoMoreWriteAfterEnd()
+    public function testNoMoreWriteAfterEnd(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createObject();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->write('a', true);
             $stream->end();
             $stream->write('b', false);
@@ -478,18 +481,18 @@ final class JsonStreamTest extends TestCase
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        $json = \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
-    public function testNoMoreWriteValueAfterEnd()
+    public function testNoMoreWriteValueAfterEnd(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createObject();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->write('a', true);
             $stream->end();
             $stream->writeValue(false);
@@ -498,18 +501,18 @@ final class JsonStreamTest extends TestCase
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        $json = \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
-    public function testNoMoreWriteArrayAfterEnd()
+    public function testNoMoreWriteArrayAfterEnd(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createObject();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->write('a', true);
             $stream->end();
             $stream->writeArray([1,2,3,4,5,6,7,8,9,10]);
@@ -518,18 +521,18 @@ final class JsonStreamTest extends TestCase
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        $json = \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
-    public function testNoMoreEndAfterEnd()
+    public function testNoMoreEndAfterEnd(): void
     {
         $loop = Factory::create();
 
         $stream = JsonStream::createObject();
 
-        $loop->addTimer(0.01, function () use ($stream) {
+        $loop->addTimer(0.01, function () use ($stream): void {
             $stream->write('a', true);
             $stream->end();
             $stream->end([1,2,3,4,5,6,7,8,9,10]);
@@ -538,21 +541,21 @@ final class JsonStreamTest extends TestCase
         $buffer = await(buffer($stream), $loop, 6);
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
+        $json = \json_decode($buffer, true);
+        self::assertSame(JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
-    public function testPauseResume()
+    public function testPauseResume(): void
     {
         $stream = JsonStream::createObject();
 
         $shouldntBeCalledCount = 0;
-        $shouldntBeCalled = function () use (&$shouldntBeCalledCount) {
+        $shouldntBeCalled = function () use (&$shouldntBeCalledCount): void {
             $shouldntBeCalledCount++;
         };
         $shouldBeCalledCount = 0;
-        $shouldBeCalled = function () use (&$shouldBeCalledCount) {
+        $shouldBeCalled = function () use (&$shouldBeCalledCount): void {
             $shouldBeCalledCount++;
         };
 
