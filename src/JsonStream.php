@@ -17,7 +17,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     const OBJECT_ENDING = '}';
     const ARRAY_BEGINNING = '[';
     const ARRAY_ENDING = ']';
-    const DEFAULT_ENCODE_FLAGS = JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_PRESERVE_ZERO_FRACTION;
+    const DEFAULT_ENCODE_FLAGS = \JSON_HEX_QUOT | \JSON_HEX_TAG | \JSON_HEX_AMP | \JSON_HEX_APOS | \JSON_PRESERVE_ZERO_FRACTION;
 
     /**
      * @var SplQueue
