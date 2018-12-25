@@ -320,7 +320,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame($output, $buffer);
         $json = \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
         self::assertInternalType('array', $json);
         self::assertSame(\json_decode($output, true), $json);
     }
@@ -339,7 +339,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('["<\'&\"&\'>"]', $buffer);
         $json = \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['<\'&"&\'>'], $json);
     }
 
@@ -358,7 +358,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{true,false}', $buffer);
         \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_SYNTAX, \json_last_error());
+        self::assertSame(\JSON_ERROR_SYNTAX, \json_last_error());
     }
 
     public function testObjectOrArrayArray(): void
@@ -375,7 +375,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('[true,false]', $buffer);
         \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
     }
 
     public function testForceArray(): void
@@ -392,7 +392,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('[true,false]', $buffer);
         \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
     }
 
     public function testForceArrayWhileWeWriteAnObject(): void
@@ -409,7 +409,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('["a":true,"b":false]', $buffer);
         \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_SYNTAX, \json_last_error());
+        self::assertSame(\JSON_ERROR_SYNTAX, \json_last_error());
     }
 
     public function testForceObject(): void
@@ -426,7 +426,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{"a":true,"b":false}', $buffer);
         \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
     }
 
     public function testForceObjectWhileWeWriteAnArray(): void
@@ -443,7 +443,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{true,false}', $buffer);
         \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_SYNTAX, \json_last_error());
+        self::assertSame(\JSON_ERROR_SYNTAX, \json_last_error());
     }
 
     public function testDoubleKeys(): void
@@ -462,7 +462,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{"a":true,"a":false}', $buffer);
         $json = \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => false], $json);
     }
 
@@ -482,7 +482,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{"a":true}', $buffer);
         $json = \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
@@ -502,7 +502,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{"a":true}', $buffer);
         $json = \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
@@ -522,7 +522,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{"a":true}', $buffer);
         $json = \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
@@ -542,7 +542,7 @@ final class JsonStreamTest extends TestCase
 
         self::assertSame('{"a":true}', $buffer);
         $json = \json_decode($buffer, true);
-        self::assertSame(JSON_ERROR_NONE, \json_last_error());
+        self::assertSame(\JSON_ERROR_NONE, \json_last_error());
         self::assertSame(['a' => true], $json);
     }
 
