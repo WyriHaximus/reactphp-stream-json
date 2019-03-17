@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
 use React\EventLoop\Factory;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
+use function React\Promise\resolve;
 use React\Stream\ThroughStream;
 use WyriHaximus\React\Stream\Json\JsonStream;
-use function React\Promise\resolve;
 
 require \dirname(__DIR__) . '/vendor/autoload.php';
 

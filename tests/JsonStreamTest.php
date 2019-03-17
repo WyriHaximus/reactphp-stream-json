@@ -2,16 +2,16 @@
 
 namespace WyriHaximus\React\Tests\Stream\Json;
 
+use function Clue\React\Block\await;
 use PHPUnit\Framework\TestCase;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
-use React\Promise\Deferred;
-use React\Stream\ThroughStream;
-use WyriHaximus\React\Stream\Json\JsonStream;
-use function Clue\React\Block\await;
 use function React\Promise\all;
+use React\Promise\Deferred;
 use function React\Promise\resolve;
 use function React\Promise\Stream\buffer;
+use React\Stream\ThroughStream;
+use WyriHaximus\React\Stream\Json\JsonStream;
 
 /**
  * @internal
@@ -321,7 +321,7 @@ final class JsonStreamTest extends TestCase
         self::assertSame($output, $buffer);
         $json = \json_decode($buffer, true);
         self::assertSame(\JSON_ERROR_NONE, \json_last_error());
-        self::assertInternalType('array', $json);
+        self::assertIsArray($json);
         self::assertSame(\json_decode($output, true), $json);
     }
 

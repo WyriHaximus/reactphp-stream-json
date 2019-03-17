@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-use React\EventLoop\Factory;
-use React\Stream\ThroughStream;
-use WyriHaximus\React\Stream\Json\JsonStream;
 use function Clue\React\Block\await;
+use React\EventLoop\Factory;
 use function React\Promise\resolve;
 use function React\Promise\Stream\buffer;
+use React\Stream\ThroughStream;
+use WyriHaximus\React\Stream\Json\JsonStream;
 
 require \dirname(__DIR__) . '/vendor/autoload.php';
 

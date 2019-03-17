@@ -5,11 +5,11 @@ namespace WyriHaximus\React\Stream\Json;
 use Evenement\EventEmitter;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
 use SplQueue;
-use function React\Promise\resolve;
 
 final class JsonStream extends EventEmitter implements ReadableStreamInterface
 {
