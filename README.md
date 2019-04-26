@@ -72,9 +72,14 @@ except for arrays, those will be searched through for promises and streams.
 `writeArray(array $values)` will iterate over the items in the array and call `write` or `writeValue` depending on 
 the type of the key. 
 
+##### writeObservable #####
+
+`writeObservable(ObservableInterface $values)` will subscribe to the observable and call `writeValue` on each item 
+coming in. 
+
 ##### end #####
 
-`writeArray(array $values = [])` will call `writeArray` when `$values` contains something and then or otherwise
+`end(array $values = [])` will call `writeArray` when `$values` contains something and then or otherwise
 end the stream. At that point no new values are accepted and it continues to operate any outstanding promises or streams
 have been resolve/completed.
 

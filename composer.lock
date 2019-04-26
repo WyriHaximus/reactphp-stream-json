@@ -4,8 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4076d381636e10cf8b5883214f714ffe",
+    "content-hash": "33f23c1a7854c7a9461baa0f1e61697b",
     "packages": [
+        {
+            "name": "api-clients/rx",
+            "version": "2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-api-clients/rx.git",
+                "reference": "c38d42768ebdb6e396066bc03055c3c9117bc6e9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-api-clients/rx/zipball/c38d42768ebdb6e396066bc03055c3c9117bc6e9",
+                "reference": "c38d42768ebdb6e396066bc03055c3c9117bc6e9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0",
+                "react/promise": "^2.4",
+                "reactivex/rxphp": "^2.0"
+            },
+            "require-dev": {
+                "api-clients/test-utilities": "^3.0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ApiClients\\Tools\\Rx\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php",
+                    "src/bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cees-Jan Kiewiet",
+                    "email": "ceesjank@gmail.com"
+                }
+            ],
+            "time": "2017-10-04T20:00:12+00:00"
+        },
         {
             "name": "evenement/evenement",
             "version": "v3.0.1",
@@ -182,6 +226,71 @@
                 "writable"
             ],
             "time": "2019-01-01T16:15:09+00:00"
+        },
+        {
+            "name": "reactivex/rxphp",
+            "version": "2.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ReactiveX/RxPHP.git",
+                "reference": "fd74a0cd2b5edd4a48e4ff12aaa44cc6cdc4a9b4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ReactiveX/RxPHP/zipball/fd74a0cd2b5edd4a48e4ff12aaa44cc6cdc4a9b4",
+                "reference": "fd74a0cd2b5edd4a48e4ff12aaa44cc6cdc4a9b4",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~7.0",
+                "react/promise": "~2.2"
+            },
+            "require-dev": {
+                "phpunit/phpcov": "^3.1",
+                "phpunit/phpunit": "^5.7",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4.2",
+                "satooshi/php-coveralls": "~1.0"
+            },
+            "suggest": {
+                "react/event-loop": "Used for scheduling async operations"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Rx\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander",
+                    "email": "iam.asm89@gmail.com"
+                },
+                {
+                    "name": "David Dan",
+                    "email": "davidwdan@gmail.com"
+                },
+                {
+                    "name": "Matt Bonneau",
+                    "email": "matt@bonneau.net"
+                }
+            ],
+            "description": "Reactive extensions for php.",
+            "homepage": "https://github.com/ReactiveX/RxPHP",
+            "keywords": [
+                "extensions",
+                "reactive",
+                "rx"
+            ],
+            "time": "2018-04-18T01:34:36+00:00"
         }
     ],
     "packages-dev": [

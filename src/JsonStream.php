@@ -4,11 +4,13 @@ namespace WyriHaximus\React\Stream\Json;
 
 use Evenement\EventEmitter;
 use React\Promise\Deferred;
+use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use function React\Promise\resolve;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
+use Rx\ObservableInterface;
 use SplQueue;
 
 final class JsonStream extends EventEmitter implements ReadableStreamInterface
@@ -159,6 +161,21 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         }
     }
 
+    public function writeObservable(ObservableInterface $values): void
+    {
+        if ($this->closing) {
+            return;
+        }
+
+        $this->objectOrArray([]);
+
+        $values->subscribe(
+            function ($value): void {
+                $this->writeValue($value);
+            }
+        );
+    }
+
     public function isReadable()
     {
         return $this->readable;
@@ -296,6 +313,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             });
         }
 
+        if ($value instanceof ObservableInterface) {
+            return $this->handleObservable($value);
+        }
+
         if ($value instanceof BufferingJsonStream) {
             return $this->handleJsonStream($value);
         }
@@ -307,6 +328,30 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->emitData($this->encode($value));
 
         return resolve();
+    }
+
+    private function handleObservable(ObservableInterface $value): PromiseInterface
+    {
+        $this->emitData('[');
+        $first = true;
+
+        return new Promise(function ($resolve, $reject) use ($value, &$first): void {
+            $value->subscribe(
+                function ($item) use (&$first): void {
+                    if ($first === false) {
+                        $this->emitData(',');
+                    }
+                    $first = false;
+
+                    $this->emitData($this->encode($item));
+                },
+                null,
+                function () use ($resolve): void {
+                    $this->emitData(']');
+                    $resolve();
+                }
+            );
+        });
     }
 
     private function handleJsonStream(BufferingStreamInterface $bufferingStream): PromiseInterface
