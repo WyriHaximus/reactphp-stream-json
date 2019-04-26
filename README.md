@@ -74,7 +74,7 @@ the type of the key.
 
 ##### end #####
 
-`writeArray(array $values = [])` will call `writeArray` when `$values` contains something and then or otherwise
+`end(array $values = [])` will call `writeArray` when `$values` contains something and then or otherwise
 end the stream. At that point no new values are accepted and it continues to operate any outstanding promises or streams
 have been resolve/completed.
 
