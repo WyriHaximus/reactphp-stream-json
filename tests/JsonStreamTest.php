@@ -15,6 +15,7 @@ use Rx\Observable;
 use Rx\ObservableInterface;
 use Rx\Subject\Subject;
 use WyriHaximus\React\Stream\Json\JsonStream;
+use function WyriHaximus\React\timedPromise;
 
 /**
  * @internal
@@ -411,6 +412,68 @@ final class JsonStreamTest extends TestCase
             $input = Observable::fromArray(['foo','bar']);
 
             return [$input, '["foo","bar"]'];
+        }];
+
+        yield [function (LoopInterface $loop) {
+            $input = Observable::fromArray([resolve('foo'), timedPromise($loop, 0.3, 'bar')]);
+
+            return [$input, '["foo","bar"]'];
+        }];
+
+        yield [function (LoopInterface $loop) {
+            $streamA = new ThroughStream();
+            $streamB = new ThroughStream();
+            $streamCenturion = new ThroughStream();
+            $deferred = new Deferred();
+            $jsonStream = new JsonStream();
+            $subject = new Subject();
+
+            $input = Observable::fromArray([resolve('foo'), timedPromise($loop, 0.3, 'bar'), [
+                'timestream' => $subject,
+                'river' => $streamA,
+                'melody' => $streamB,
+                'from' => $deferred->promise(),
+                'vortex' => $jsonStream,
+            ]]);
+
+            $loop->addTimer(0.1, function () use ($streamA): void {
+                $streamA->end('song');
+            });
+
+            $loop->addTimer(0.05, function () use ($streamB): void {
+                $streamB->end('by the pond');
+            });
+
+            $loop->addTimer(0.01, function () use ($deferred): void {
+                $deferred->resolve('the vortex');
+            });
+
+            $loop->addTimer(0.05, function () use ($jsonStream, $streamCenturion): void {
+                $jsonStream->end([
+                    'ponds' => resolve([
+                        'f' => resolve(resolve(resolve('the girl who waited'))),
+                        'm' => resolve($streamCenturion),
+                    ]),
+                ]);
+            });
+
+            $loop->addTimer(0.1, function () use ($streamCenturion): void {
+                $streamCenturion->end('the last centurion');
+            });
+
+            $loop->addTimer(0.2, function () use ($subject): void {
+                $subject->onNext('don\'t');
+            });
+
+            $loop->addTimer(0.7, function () use ($subject): void {
+                $subject->onNext('blink');
+            });
+
+            $loop->addTimer(0.9, function () use ($subject): void {
+                $subject->onCompleted();
+            });
+
+            return [$input, '["foo","bar",{"timestream":["don\u0027t","blink"],"river":"song","melody":"by the pond","from":"the vortex","vortex":{"ponds":{"f":"the girl who waited","m":"the last centurion"}}}]'];
         }];
     }
 
