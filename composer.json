@@ -10,8 +10,10 @@
     ],
     "require": {
         "php": "^7.2",
+        "api-clients/rx": "^2.2",
         "react/promise": "^2.7",
-        "react/stream": "^1.1.0"
+        "react/stream": "^1.1.0",
+        "reactivex/rxphp": "^2.0"
     },
     "require-dev": {
         "api-clients/cs-fixer-config": "^1.1",

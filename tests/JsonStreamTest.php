@@ -11,6 +11,9 @@ use React\Promise\Deferred;
 use function React\Promise\resolve;
 use function React\Promise\Stream\buffer;
 use React\Stream\ThroughStream;
+use Rx\Observable;
+use Rx\ObservableInterface;
+use Rx\Subject\Subject;
 use WyriHaximus\React\Stream\Json\JsonStream;
 
 /**
@@ -175,6 +178,105 @@ final class JsonStreamTest extends TestCase
         }];
 
         yield [function (LoopInterface $loop) {
+            $streamA = new ThroughStream();
+            $streamB = new ThroughStream();
+            $streamCenturion = new ThroughStream();
+            $deferred = new Deferred();
+            $jsonStream = new JsonStream();
+
+            $input = [
+                'river' => $streamA,
+                'melody' => $streamB,
+                'from' => $deferred->promise(),
+                'vortex' => $jsonStream,
+                'timestream' => Observable::fromArray(['don\'t','blink']),
+            ];
+
+            $loop->addTimer(0.1, function () use ($streamA): void {
+                $streamA->end('song');
+            });
+
+            $loop->addTimer(0.05, function () use ($streamB): void {
+                $streamB->end('by the pond');
+            });
+
+            $loop->addTimer(0.01, function () use ($deferred): void {
+                $deferred->resolve('the vortex');
+            });
+
+            $loop->addTimer(0.05, function () use ($jsonStream, $streamCenturion): void {
+                $jsonStream->end([
+                    'ponds' => resolve([
+                        'f' => resolve(resolve(resolve('the girl who waited'))),
+                        'm' => resolve($streamCenturion),
+                    ]),
+                ]);
+            });
+
+            $loop->addTimer(0.1, function () use ($streamCenturion): void {
+                $streamCenturion->end('the last centurion');
+            });
+
+            return [$input, '{"river":"song","melody":"by the pond","from":"the vortex","vortex":{"ponds":{"f":"the girl who waited","m":"the last centurion"}},"timestream":["don\u0027t","blink"]}'];
+        }];
+
+        yield [function (LoopInterface $loop) {
+            $streamA = new ThroughStream();
+            $streamB = new ThroughStream();
+            $streamCenturion = new ThroughStream();
+            $deferred = new Deferred();
+            $jsonStream = new JsonStream();
+            $subject = new Subject();
+
+            $input = [
+                'timestream' => $subject,
+                'river' => $streamA,
+                'melody' => $streamB,
+                'from' => $deferred->promise(),
+                'vortex' => $jsonStream,
+            ];
+
+            $loop->addTimer(0.1, function () use ($streamA): void {
+                $streamA->end('song');
+            });
+
+            $loop->addTimer(0.05, function () use ($streamB): void {
+                $streamB->end('by the pond');
+            });
+
+            $loop->addTimer(0.01, function () use ($deferred): void {
+                $deferred->resolve('the vortex');
+            });
+
+            $loop->addTimer(0.05, function () use ($jsonStream, $streamCenturion): void {
+                $jsonStream->end([
+                    'ponds' => resolve([
+                        'f' => resolve(resolve(resolve('the girl who waited'))),
+                        'm' => resolve($streamCenturion),
+                    ]),
+                ]);
+            });
+
+            $loop->addTimer(0.1, function () use ($streamCenturion): void {
+                $streamCenturion->end('the last centurion');
+            });
+
+            $loop->addTimer(0.2, function () use ($subject): void {
+                $subject->onNext('don\'t');
+            });
+
+            $loop->addTimer(0.7, function () use ($subject): void {
+                $subject->onNext('blink');
+            });
+
+            $loop->addTimer(0.9, function () use ($subject): void {
+                $subject->onCompleted();
+            });
+
+            return [$input, '{"timestream":["don\u0027t","blink"],"river":"song","melody":"by the pond","from":"the vortex","vortex":{"ponds":{"f":"the girl who waited","m":"the last centurion"}}}'];
+        }];
+
+        yield [function (LoopInterface $loop) {
             $stream = new ThroughStream();
 
             $input = [
@@ -296,6 +398,20 @@ final class JsonStreamTest extends TestCase
 
             return [$input, '{"\ud83d\ude31":"\u003C\u0027\u0026\u0022\u0026\u0027\u003E"}'];
         }];
+
+        yield [function (LoopInterface $loop) {
+            $input = [
+                '😱' => Observable::fromArray(['foo','bar']),
+            ];
+
+            return [$input, '{"\ud83d\ude31":["foo","bar"]}'];
+        }];
+
+        yield [function (LoopInterface $loop) {
+            $input = Observable::fromArray(['foo','bar']);
+
+            return [$input, '["foo","bar"]'];
+        }];
     }
 
     /**
@@ -313,6 +429,12 @@ final class JsonStreamTest extends TestCase
         $stream->pipe($throughStream);
 
         $loop->addTimer(0.01, function () use ($stream, $input): void {
+            if ($input instanceof ObservableInterface) {
+                $stream->writeObservable($input);
+                $stream->end();
+
+                return;
+            }
             $stream->end($input);
         });
 
