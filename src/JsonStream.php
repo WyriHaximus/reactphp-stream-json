@@ -10,6 +10,7 @@ use function React\Promise\resolve;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
+use Rx\Observable;
 use Rx\ObservableInterface;
 use SplQueue;
 
@@ -336,7 +337,9 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $first = true;
 
         return new Promise(function ($resolve, $reject) use ($value, &$first): void {
-            $value->subscribe(
+            $value->flatMap(function ($value) {
+                return Observable::fromPromise(resolve($this->wrapValue($value)));
+            })->subscribe(
                 function ($item) use (&$first): void {
                     if ($first === false) {
                         $this->emitData(',');
@@ -418,7 +421,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             $this->encodeFlags
         );
 
-        if (!$stripWrappingQuotes) {
+        if ($stripWrappingQuotes === false) {
             return $json;
         }
 

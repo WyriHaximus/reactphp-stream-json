@@ -475,6 +475,14 @@ final class JsonStreamTest extends TestCase
 
             return [$input, '["foo","bar",{"timestream":["don\u0027t","blink"],"river":"song","melody":"by the pond","from":"the vortex","vortex":{"ponds":{"f":"the girl who waited","m":"the last centurion"}}}]'];
         }];
+
+        yield [function (LoopInterface $loop) {
+            $input = [
+                'data' => Observable::fromArray([timedPromise($loop, 0.1, 'foo'), timedPromise($loop, 0.3, 'bar')]),
+            ];
+
+            return [$input, '{"data":["foo","bar"]}'];
+        }];
     }
 
     /**
