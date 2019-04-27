@@ -192,6 +192,12 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->paused = false;
         $this->emitData($this->buffer);
         $this->buffer = '';
+
+        if ($this->queue->count() === 0 && $this->closing) {
+            $this->emit('end');
+            $this->readable = false;
+            $this->emit('close');
+        }
     }
 
     public function pipe(WritableStreamInterface $dest, array $options = [])
@@ -255,9 +261,11 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         if ($this->queue->count() === 0 && $this->closing) {
             $this->emitData($this->ending);
-            $this->emit('end');
-            $this->readable = false;
-            $this->emit('close');
+            if ($this->buffer === '') {
+                $this->emit('end');
+                $this->readable = false;
+                $this->emit('close');
+            }
 
             return;
         }
