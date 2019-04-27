@@ -98,6 +98,12 @@ out again to the stream. Bear in mind that while `PHP` considers this perfectly 
 milage might vary, as described in [section 4](https://tools.ietf.org/html/rfc7159#section-4) of 
 RFC7159, in `PHP`'s case it will only use the value from the last occurrence.
 
+### Factories ###
+
+This package ships with a factory containing factory methods for arrays `JsonStreamFactory::createFromArray` and 
+observables `JsonStreamFactory::createFromObservable`. Both will create a few stream, pause it, write the 
+array/observable to it, and end it.
+
 ## Contributing ##
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
