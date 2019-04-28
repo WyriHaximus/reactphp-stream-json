@@ -346,7 +346,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
                     }
                     $first = false;
 
-                    $this->emitData($this->encode($item));
+                    $this->formatValue($item);
                 },
                 null,
                 function () use ($resolve): void {
