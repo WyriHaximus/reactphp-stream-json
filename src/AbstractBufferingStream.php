@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Stream\Json;
 
@@ -6,25 +8,13 @@ use React\Stream\ReadableStreamInterface;
 
 abstract class AbstractBufferingStream implements BufferingStreamInterface
 {
-    /**
-     * @var ReadableStreamInterface
-     */
-    private $stream;
+    private ReadableStreamInterface $stream;
 
-    /**
-     * @var string
-     */
-    private $buffer = '';
+    private string $buffer = '';
 
-    /**
-     * @var bool
-     */
-    private $isDone = false;
+    private bool $isDone = false;
 
-    /**
-     * @param ReadableStreamInterface $stream
-     */
-    protected function setUp(ReadableStreamInterface $stream): void
+    final protected function setUp(ReadableStreamInterface $stream): void
     {
         $this->stream = $stream;
         $this->stream->on('data', [$this, 'onData']);
@@ -33,9 +23,10 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
 
     /**
      * @internal
+     *
      * @param mixed $data
      */
-    public function onData($data): void
+    final public function onData($data): void
     {
         $this->buffer .= $data;
     }
@@ -43,12 +34,12 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
     /**
      * @internal
      */
-    public function onClose(): void
+    final public function onClose(): void
     {
         $this->isDone = true;
     }
 
-    public function takeOverStream(): ReadableStreamInterface
+    final public function takeOverStream(): ReadableStreamInterface
     {
         $this->stream->removeListener('data', [$this, 'onData']);
         $this->stream->removeListener('close', [$this, 'onClose']);
@@ -57,15 +48,15 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
         return $this->stream;
     }
 
-    public function takeOverBuffer(): string
+    final public function takeOverBuffer(): string
     {
-        $buffer = $this->buffer;
+        $buffer       = $this->buffer;
         $this->buffer = '';
 
         return $buffer;
     }
 
-    public function isDone(): bool
+    final public function isDone(): bool
     {
         return $this->isDone;
     }

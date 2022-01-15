@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\Stream\Json;
 
-use PHPUnit\Framework\TestCase;
 use React\Stream\ThroughStream;
+use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\Stream\Json\BufferingReadableStream;
 
 /**
  * @internal
  */
-final class BufferingReadableStreamTest extends TestCase
+final class BufferingReadableStreamTest extends AsyncTestCase
 {
     public function testBuffering(): void
     {
-        $stream = new ThroughStream();
+        $stream          = new ThroughStream();
         $bufferingStream = new BufferingReadableStream($stream);
 
         self::assertFalse($bufferingStream->isDone());
@@ -37,7 +39,7 @@ final class BufferingReadableStreamTest extends TestCase
 
     public function testBufferingStreamClose(): void
     {
-        $stream = new ThroughStream();
+        $stream          = new ThroughStream();
         $bufferingStream = new BufferingReadableStream($stream);
 
         self::assertFalse($bufferingStream->isDone());

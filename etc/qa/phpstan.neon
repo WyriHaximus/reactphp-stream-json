@@ -1,0 +1,8 @@
+parameters:
+	ergebnis:
+		classesAllowedToBeExtended:
+			- Evenement\EventEmitter
+			- WyriHaximus\React\Stream\Json\AbstractBufferingStream
+
+includes:
+	- ../../vendor/wyrihaximus/async-test-utilities/rules.neon
