@@ -23,10 +23,8 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
 
     /**
      * @internal
-     *
-     * @param mixed $data
      */
-    final public function onData($data): void
+    final public function onData(mixed $data): void
     {
         $this->buffer .= $data;
     }

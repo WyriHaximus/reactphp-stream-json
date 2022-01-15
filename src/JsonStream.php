@@ -35,7 +35,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     public const ARRAY_ENDING         = ']';
     public const DEFAULT_ENCODE_FLAGS = JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_PRESERVE_ZERO_FRACTION;
 
-    /** @var SplQueue<mixed> */
+    /** @var SplQueue<array{id: int, key: string|null, value: mixed}> */
     private SplQueue $queue;
 
     private ?int $currentId = null;
@@ -87,10 +87,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return $self;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function write(string $key, $value): void
+    public function write(string $key, mixed $value): void
     {
         if ($this->closing) {
             return;
@@ -109,10 +106,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->nextItem();
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function writeValue($value): void
+    public function writeValue(mixed $value): void
     {
         if ($this->closing) {
             return;
@@ -311,12 +305,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         });
     }
 
-    /**
-     * @param mixed|JsonStream|ReadableStreamInterface $value
-     *
-     * @return BufferingStreamInterface|mixed
-     */
-    private function wrapValue($value)
+    private function wrapValue(mixed $value): mixed
     {
         if ($value instanceof JsonStream) {
             return new BufferingJsonStream($value);
@@ -337,10 +326,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return $value;
     }
 
-    /**
-     * @param mixed $value
-     */
-    private function formatValue($value): PromiseInterface
+    private function formatValue(mixed $value): PromiseInterface
     {
         if ($value instanceof PromiseInterface) {
             /**
@@ -459,10 +445,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->emit('data', [$data]);
     }
 
-    /**
-     * @param mixed $value
-     */
-    private function encode($value, bool $stripWrappingQuotes = false): string
+    private function encode(mixed $value, bool $stripWrappingQuotes = false): string
     {
         $json = json_encode(
             $value,

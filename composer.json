@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "php": "^8 || ^7.4",
+        "php": "^8",
         "ext-json": "*",
         "api-clients/rx": "^2.2",
         "evenement/evenement": "^3.0",
@@ -42,7 +42,7 @@
             "ergebnis/composer-normalize": true
         },
         "platform": {
-            "php": "7.4.7"
+            "php": "8.0.12"
         },
         "sort-packages": true
     },
