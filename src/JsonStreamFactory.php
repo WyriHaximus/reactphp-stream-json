@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Stream\Json;
 
@@ -6,6 +8,9 @@ use Rx\ObservableInterface;
 
 final class JsonStreamFactory
 {
+    /**
+     * @param array<mixed> $values
+     */
     public static function createFromArray(array $values, int $encodeFlags = JsonStream::DEFAULT_ENCODE_FLAGS): JsonStream
     {
         $stream = new JsonStream($encodeFlags);
