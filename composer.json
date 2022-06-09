@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "react/promise-stream": "^1.2",
-        "wyrihaximus/async-test-utilities": "^4.2",
+        "wyrihaximus/async-test-utilities": "^4.2 || ^5.0",
         "wyrihaximus/ticking-promise": "^3"
     },
     "autoload": {
