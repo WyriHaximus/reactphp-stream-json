@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "php": "^8",
+        "php": "^8.1",
         "ext-json": "*",
         "api-clients/rx": "^2.2",
         "evenement/evenement": "^3.0",
@@ -39,10 +39,12 @@
             "infection/extension-installer": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "icanhazstring/composer-unused": true,
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "ocramius/package-versions": true,
+            "localheinz/composer-normalize": true
         },
         "platform": {
-            "php": "8.0.12"
+            "php": "8.1.12"
         },
         "sort-packages": true
     },
