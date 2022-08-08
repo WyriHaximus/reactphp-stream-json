@@ -9,10 +9,8 @@ use React\Stream\ReadableStreamInterface;
 abstract class AbstractBufferingStream implements BufferingStreamInterface
 {
     private ReadableStreamInterface $stream;
-
     private string $buffer = '';
-
-    private bool $isDone = false;
+    private bool $isDone   = false;
 
     final protected function setUp(ReadableStreamInterface $stream): void
     {
@@ -24,7 +22,7 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
     /**
      * @internal
      */
-    final public function onData(mixed $data): void
+    final public function onData(string $data): void
     {
         $this->buffer .= $data;
     }
