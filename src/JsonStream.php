@@ -15,6 +15,7 @@ use Rx\Observable;
 use Rx\ObservableInterface;
 use SplQueue;
 
+use function array_keys;
 use function is_array;
 use function is_string;
 use function React\Promise\resolve;
@@ -37,27 +38,16 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     /** @var SplQueue<array{id: int, key: string|null, value: mixed}> */
     private SplQueue $queue;
-
-    private ?int $currentId = null;
-
-    private bool $closing = false;
-
-    private bool $first = true;
-
+    private ?int $currentId    = null;
+    private bool $closing      = false;
+    private bool $first        = true;
     private bool $typeDetected = false;
-
-    private int $i = 0;
-
-    private string $beginning = self::OBJECT_BEGINNING;
-
-    private string $ending = self::OBJECT_ENDING;
-
-    private bool $readable = true;
-
-    private bool $paused = false;
-
-    private string $buffer = '';
-
+    private int $i             = 0;
+    private string $beginning  = self::OBJECT_BEGINNING;
+    private string $ending     = self::OBJECT_ENDING;
+    private bool $readable     = true;
+    private bool $paused       = false;
+    private string $buffer     = '';
     private int $encodeFlags;
 
     /**
@@ -66,7 +56,10 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     public function __construct(int $encodeFlags = self::DEFAULT_ENCODE_FLAGS)
     {
         $this->encodeFlags = $encodeFlags;
-        $this->queue       = new SplQueue();
+        /**
+         * @psalm-suppress MixedPropertyTypeCoercion
+         */
+        $this->queue = new SplQueue();
     }
 
     public static function createArray(): JsonStream
@@ -95,6 +88,9 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $id = $this->i++;
 
+        /**
+         * @psalm-suppress MixedAssignment
+         */
         $value = $this->wrapValue($value);
 
         $this->queue->enqueue([
@@ -114,6 +110,9 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $id = $this->i++;
 
+        /**
+         * @psalm-suppress MixedAssignment
+         */
         $value = $this->wrapValue($value);
 
         $this->queue->enqueue([
@@ -129,7 +128,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
      * This method can't be changed to accepting variadic because it needs to detect if it needs to be written out
      * as an array or object in JSON
      *
-     * @param array<mixed> $values
+     * @param array<array-key, mixed> $values
      */
     public function writeArray(array $values): void
     {
@@ -139,6 +138,9 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $this->objectOrArray($values);
 
+        /**
+         * @psalm-suppress MixedAssignment
+         */
         foreach ($values as $key => $value) {
             if (is_string($key)) {
                 $this->write($key, $value);
@@ -246,7 +248,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             return;
         }
 
-        foreach ($values as $key => $value) {
+        foreach (array_keys($values) as $key) {
             if (is_string($key)) {
                 return;
             }
@@ -359,7 +361,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $this->emitData('[');
         $first = true;
 
-        return new Promise(function (callable $resolve, callable $reject) use ($value, &$first): void {
+        return new Promise(function (callable $resolve) use ($value, &$first): void {
             /**
              * @psalm-suppress MissingClosureParamType
              */
@@ -395,7 +397,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         /**
          * @psalm-suppress MissingClosureParamType
          */
-        $stream->on('data', function ($data): void {
+        $stream->on('data', function (string $data): void {
             $this->emitData($data);
         });
         $deferred = new Deferred();

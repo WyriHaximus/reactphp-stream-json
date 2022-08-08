@@ -3,7 +3,7 @@
     "null", "true", "false",
     "static", "self", "parent",
     "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object", "mixed",
-    "WyriHaximus\\Constants\\Boolean\\TRUE_", "WyriHaximus\\Constants\\Boolean\\FALSE_"
+    "Safe\\json_encode"
   ],
   "php-core-extensions" : [
     "Core",

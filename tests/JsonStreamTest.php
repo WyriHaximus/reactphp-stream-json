@@ -583,7 +583,7 @@ final class JsonStreamTest extends AsyncTestCase
         self::assertSame('["<\'&\"&\'>"]', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
         self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['<\'&"&\'>'], $json);
+        self::assertSame(['<\'&"&\'>'], $json); /** @phpstan-ignore-line */
     }
 
     public function testObjectOrArrayObject(): void
@@ -692,7 +692,7 @@ final class JsonStreamTest extends AsyncTestCase
         self::assertSame('{"a":true,"a":false}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
         self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => false], $json);
+        self::assertSame(['a' => false], $json); /** @phpstan-ignore-line */
     }
 
     public function testNoMoreWriteAfterEnd(): void
@@ -710,7 +710,7 @@ final class JsonStreamTest extends AsyncTestCase
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
         self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json);
+        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
     public function testNoMoreWriteValueAfterEnd(): void
@@ -728,7 +728,7 @@ final class JsonStreamTest extends AsyncTestCase
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
         self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json);
+        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
     public function testNoMoreWriteArrayAfterEnd(): void
@@ -746,7 +746,7 @@ final class JsonStreamTest extends AsyncTestCase
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
         self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json);
+        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
     public function testNoMoreEndAfterEnd(): void
@@ -764,7 +764,7 @@ final class JsonStreamTest extends AsyncTestCase
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
         self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json);
+        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
     public function testPauseResume(): void
@@ -788,28 +788,28 @@ final class JsonStreamTest extends AsyncTestCase
 
         $stream->write('key', 'value');
 
-        self::assertSame(0, $shouldntBeCalledCount);
-        self::assertSame(0, $shouldBeCalledCount);
+        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
+        self::assertSame(0, $shouldBeCalledCount); /** @phpstan-ignore-line */
 
         $stream->removeListener('data', $shouldntBeCalled);
         $stream->on('data', $shouldBeCalled);
 
-        self::assertSame(0, $shouldntBeCalledCount);
-        self::assertSame(0, $shouldBeCalledCount);
+        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
+        self::assertSame(0, $shouldBeCalledCount); /** @phpstan-ignore-line */
 
         $stream->resume();
 
-        self::assertSame(0, $shouldntBeCalledCount);
+        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
         self::assertSame(1, $shouldBeCalledCount); /** @phpstan-ignore-line */
 
         $stream->write('key', 'value');
 
-        self::assertSame(0, $shouldntBeCalledCount);
-        self::assertSame(4, $shouldBeCalledCount); /** @phpstan-ignore-line */
+        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
+        self::assertSame(4, $shouldBeCalledCount);
 
         $stream->end();
 
-        self::assertSame(0, $shouldntBeCalledCount);
-        self::assertSame(5, $shouldBeCalledCount); /** @phpstan-ignore-line */
+        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
+        self::assertSame(5, $shouldBeCalledCount);
     }
 }
