@@ -20,7 +20,7 @@
     "require-dev": {
         "api-clients/rx": "^2.2",
         "react/promise-stream": "^1.2",
-        "wyrihaximus/async-test-utilities": "^4.2 || ^5.0",
+        "wyrihaximus/async-test-utilities": "^5.0.10",
         "wyrihaximus/ticking-promise": "^3"
     },
     "autoload": {
