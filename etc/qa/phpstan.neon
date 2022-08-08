@@ -1,8 +1,9 @@
 parameters:
+	checkGenericClassInNonGenericObjectType: false
 	ergebnis:
 		classesAllowedToBeExtended:
-			- Evenement\EventEmitter
-			- WyriHaximus\React\Stream\Json\AbstractBufferingStream
+			- WyriHaximus\React\PSR3\Loggly\AbstractLogglyLogger
+			- Psr\Log\AbstractLogger
 
 includes:
 	- ../../vendor/wyrihaximus/async-test-utilities/rules.neon
