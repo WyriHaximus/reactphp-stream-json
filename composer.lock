@@ -4772,16 +4772,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.6.4",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "135607f9ccc297d6923d49c2bcf309f509413215"
+                "reference": "367a8d9d5f7da2a0136422d27ce8840583926955"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/135607f9ccc297d6923d49c2bcf309f509413215",
-                "reference": "135607f9ccc297d6923d49c2bcf309f509413215",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/367a8d9d5f7da2a0136422d27ce8840583926955",
+                "reference": "367a8d9d5f7da2a0136422d27ce8840583926955",
                 "shasum": ""
             },
             "require": {
@@ -4811,9 +4811,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.6.4"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.7.0"
             },
-            "time": "2022-06-26T13:09:08+00:00"
+            "time": "2022-08-09T12:23:23+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -9422,16 +9422,16 @@
         },
         {
             "name": "wyrihaximus/async-test-utilities",
-            "version": "5.0.11",
+            "version": "5.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/php-async-test-utilities.git",
-                "reference": "98b88fd5af23240ad48c4409c3e8292bafb4ec99"
+                "reference": "72db9a80544b075e9de2cb98c6e5bd3b909a287a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/php-async-test-utilities/zipball/98b88fd5af23240ad48c4409c3e8292bafb4ec99",
-                "reference": "98b88fd5af23240ad48c4409c3e8292bafb4ec99",
+                "url": "https://api.github.com/repos/WyriHaximus/php-async-test-utilities/zipball/72db9a80544b075e9de2cb98c6e5bd3b909a287a",
+                "reference": "72db9a80544b075e9de2cb98c6e5bd3b909a287a",
                 "shasum": ""
             },
             "require": {
@@ -9440,7 +9440,7 @@
                 "phpunit/phpunit": "^9.5.21",
                 "react/event-loop": "^1.3.0",
                 "react/promise": "^2.9.",
-                "wyrihaximus/test-utilities": "^5.0.20"
+                "wyrihaximus/test-utilities": "^5.0.21"
             },
             "require-dev": {
                 "wyrihaximus/iterator-or-array-to-array": "^1.2"
@@ -9464,7 +9464,7 @@
             "description": "Test utilities for api-clients packages",
             "support": {
                 "issues": "https://github.com/WyriHaximus/php-async-test-utilities/issues",
-                "source": "https://github.com/WyriHaximus/php-async-test-utilities/tree/5.0.11"
+                "source": "https://github.com/WyriHaximus/php-async-test-utilities/tree/5.0.12"
             },
             "funding": [
                 {
@@ -9472,7 +9472,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-08-08T19:06:37+00:00"
+            "time": "2022-08-12T11:01:22+00:00"
         },
         {
             "name": "wyrihaximus/coding-standard",
@@ -9565,16 +9565,16 @@
         },
         {
             "name": "wyrihaximus/test-utilities",
-            "version": "5.0.20",
+            "version": "5.0.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/php-test-utilities.git",
-                "reference": "ca8fe686b64703dfe832dab6741ded87d8b21c6a"
+                "reference": "d393dfbf9a2fe10af2ae0a2f11f1c42b9069505c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/php-test-utilities/zipball/ca8fe686b64703dfe832dab6741ded87d8b21c6a",
-                "reference": "ca8fe686b64703dfe832dab6741ded87d8b21c6a",
+                "url": "https://api.github.com/repos/WyriHaximus/php-test-utilities/zipball/d393dfbf9a2fe10af2ae0a2f11f1c42b9069505c",
+                "reference": "d393dfbf9a2fe10af2ae0a2f11f1c42b9069505c",
                 "shasum": ""
             },
             "require": {
@@ -9598,7 +9598,7 @@
                 "roave/backward-compatibility-check": "^7 || ^6",
                 "roave/infection-static-analysis-plugin": "^1.18.0",
                 "squizlabs/php_codesniffer": "^3.7.1",
-                "thecodingmachine/safe": "^1.3.3",
+                "thecodingmachine/safe": "^1.3.3 || ^2.2",
                 "vimeo/psalm": "^4.26",
                 "wyrihaximus/coding-standard": "^2.11.0",
                 "wyrihaximus/phpstan-rules-wrapper": "^2"
@@ -9645,7 +9645,7 @@
             "description": "🛠️ Test utilities for api-clients packages",
             "support": {
                 "issues": "https://github.com/WyriHaximus/php-test-utilities/issues",
-                "source": "https://github.com/WyriHaximus/php-test-utilities/tree/5.0.20"
+                "source": "https://github.com/WyriHaximus/php-test-utilities/tree/5.0.21"
             },
             "funding": [
                 {
@@ -9653,7 +9653,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-08-03T03:11:01+00:00"
+            "time": "2022-08-12T10:13:18+00:00"
         },
         {
             "name": "wyrihaximus/ticking-promise",
