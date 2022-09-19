@@ -28,6 +28,7 @@ jobs:
     outputs:
       version: ${{ steps.supported-versions-matrix.outputs.version }}
       upcoming: ${{ steps.supported-versions-matrix.outputs.upcoming }}
+      extensions: ${{ steps.supported-versions-matrix.outputs.extensions }}
     steps:
       - uses: actions/checkout@v3
       - id: supported-versions-matrix
@@ -128,7 +129,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: pcov
-          extensions: intl, sodium
+          extensions: ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ',') }}
       - uses: ramsey/composer-install@v2
         with:
           dependency-versions: ${{ matrix.composer }}
