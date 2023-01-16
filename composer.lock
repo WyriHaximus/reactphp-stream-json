@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cbc1a0a9358da50459e7e19e064045aa",
+    "content-hash": "b0b6e14de2805366fce1393012534cb2",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -920,6 +920,7 @@
                     "type": "github"
                 }
             ],
+            "abandoned": "react/async",
             "time": "2021-10-20T14:07:33+00:00"
         },
         {
