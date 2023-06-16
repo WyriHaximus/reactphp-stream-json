@@ -310,9 +310,9 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     private function wrapValue(mixed $value): mixed
     {
         if ($value instanceof PromiseInterface) {
-            return $value->then(fn ($result) => $this->wrapValue($result));
+            return $value->then(fn (mixed $result): mixed => $this->wrapValue($result));
         }
-        
+
         if ($value instanceof JsonStream) {
             return new BufferingJsonStream($value);
         }
