@@ -812,4 +812,49 @@ final class JsonStreamTest extends AsyncTestCase
         self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
         self::assertSame(5, $shouldBeCalledCount);
     }
+
+    public function testDoubleResolveStream(): void
+    {
+
+        $jsonStream = new JsonStream();
+        $anotherStream = new ThroughStream();
+        $anotherStream1 = new ThroughStream();
+
+        Loop::addTimer(0.001, static function () use ($jsonStream, $anotherStream, $anotherStream1): void {
+            $jsonStream->end([
+                'first',
+                resolve($anotherStream),
+                resolve($anotherStream1),
+                resolve('third'),
+            ]);
+        });
+        
+       
+        $i = 0;
+        $timer = Loop::addPeriodicTimer(0.1, function () use ($anotherStream, &$i, &$timer): void {
+            $i++;
+            $anotherStream->write((string)$i);
+            if ($i > 10) {
+                $anotherStream->end();
+                Loop::cancelTimer($timer);
+            }
+        });
+        
+        $j = 0;
+        $timer1 = Loop::addPeriodicTimer(0.01, function () use ($anotherStream1, &$j, &$timer1): void {
+            $j++;
+            $anotherStream1->write((string)($j));
+            if ($j > 10 ) {
+                $anotherStream1->end();
+                Loop::cancelTimer($timer1);
+            }
+        });
+
+        $buffer = $this->await(buffer($jsonStream), 2);
+
+        self::assertSame('["first","1234567891011","1234567891011","third"]', $buffer);
+        
+    }
+
+    
 }
