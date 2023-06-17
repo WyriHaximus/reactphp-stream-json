@@ -9,16 +9,12 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\Stream\Json\JsonStreamFactory;
 
 use function ApiClients\Tools\Rx\observableFromArray;
+use function React\Async\await;
 use function React\Promise\Stream\buffer;
 
-/**
- * @internal
- */
 final class JsonStreamFactoryTest extends AsyncTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function createFromArray(): void
     {
         $array = [
@@ -31,13 +27,11 @@ final class JsonStreamFactoryTest extends AsyncTestCase
             $stream->resume();
         });
 
-        $json = $this->await(buffer($stream));
+        $json = await(buffer($stream));
         self::assertSame('["cuvee","buffalo"]', $json);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function createFromObservavle(): void
     {
         $array = [
@@ -50,7 +44,7 @@ final class JsonStreamFactoryTest extends AsyncTestCase
             $stream->resume();
         });
 
-        $json = $this->await(buffer($stream));
+        $json = await(buffer($stream));
         self::assertSame('["cuvee","buffalo"]', $json);
     }
 }

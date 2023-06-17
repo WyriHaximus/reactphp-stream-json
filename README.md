@@ -1,18 +1,17 @@
 # Incremental JSON stream for [ReactPHP](https://github.com/reactphp/) streams
 
-[![Linux Build Status](https://travis-ci.org/WyriHaximus/reactphp-stream-json.png)](https://travis-ci.org/WyriHaximus/reactphp-stream-json)
-[![Latest Stable Version](https://poser.pugx.org/WyriHaximus/react-stream-json/v/stable.png)](https://packagist.org/packages/WyriHaximus/react-stream-json)
-[![Total Downloads](https://poser.pugx.org/WyriHaximus/react-stream-json/downloads.png)](https://packagist.org/packages/WyriHaximus/react-stream-json/stats)
-[![Code Coverage](https://scrutinizer-ci.com/g/WyriHaximus/reactphp-stream-json/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/WyriHaximus/reactphp-stream-json/?branch=master)
-[![License](https://poser.pugx.org/WyriHaximus/react-stream-json/license.png)](https://packagist.org/packages/wyrihaximus/react-stream-json)
-[![PHP 7 ready](http://php7ready.timesplinter.ch/WyriHaximus/reactphp-stream-json/badge.svg)](https://travis-ci.org/WyriHaximus/reactphp-stream-json)
+![Continuous Integration](https://github.com/wyrihaximus/reactphp-stream-json/workflows/Continuous%20Integration/badge.svg)
+[![Latest Stable Version](https://poser.pugx.org/wyrihaximus/react-stream-json/v/stable.png)](https://packagist.org/packages/wyrihaximus/react-stream-json)
+[![Total Downloads](https://poser.pugx.org/wyrihaximus/react-stream-json/downloads.png)](https://packagist.org/packages/wyrihaximus/react-stream-json/stats)
+[![Type Coverage](https://shepherd.dev/github/WyriHaximus/reactphp-stream-json/coverage.svg)](https://shepherd.dev/github/WyriHaximus/reactphp-stream-json)
+[![License](https://poser.pugx.org/wyrihaximus/react-stream-json/license.png)](https://packagist.org/packages/wyrihaximus/react-stream-json)
 
 ### Installation ###
 
 To install via [Composer](http://getcomposer.org/), use the command below, it will automatically detect the latest version and bind it with `^`.
 
 ```
-composer require wyrihaximus/react-stream-json 
+composer require wyrihaximus/react-stream-json
 ```
 
 ### Usage ###
@@ -54,9 +53,9 @@ Stream contents will be:
 
 ### Methods ###
 
-All the following methods try to resolve `$value`, when it encounters a promise it will wait for the promise 
-to resolve, and when it encounters a stream it will forward the stream's contents to it's own listeners. 
-Promises can resolve to a stream but not vise versa. Any other parameters will be run though `json_encode`, 
+All the following methods try to resolve `$value`, when it encounters a promise it will wait for the promise
+to resolve, and when it encounters a stream it will forward the stream's contents to it's own listeners.
+Promises can resolve to a stream but not vise versa. Any other parameters will be run though `json_encode`,
 except for arrays, those will be searched through for promises and streams.
 
 ##### write #####
@@ -69,13 +68,13 @@ except for arrays, those will be searched through for promises and streams.
 
 ##### writeArray #####
 
-`writeArray(array $values)` will iterate over the items in the array and call `write` or `writeValue` depending on 
-the type of the key. 
+`writeArray(array $values)` will iterate over the items in the array and call `write` or `writeValue` depending on
+the type of the key.
 
 ##### writeObservable #####
 
-`writeObservable(ObservableInterface $values)` will subscribe to the observable and call `writeValue` on each item 
-coming in. 
+`writeObservable(ObservableInterface $values)` will subscribe to the observable and call `writeValue` on each item
+coming in.
 
 ##### end #####
 
@@ -88,20 +87,20 @@ have been resolve/completed.
 The stream doesn't know if you want to write an object or an array so it assumes an object.
 It does try to detect when you haven't written anything yet and call `writeArray` or `end`
 with an array of items. You can force writing an array or object by calling `JsonStream::createArray`
-or `JsonStream::createObject` when creating an instance of `JsonStream`. Writing object items 
-to a stream set up as array or vise versa will result in malformed `JSON`. In short you MUST 
+or `JsonStream::createObject` when creating an instance of `JsonStream`. Writing object items
+to a stream set up as array or vise versa will result in malformed `JSON`. In short you MUST
 know what kind of `JSON` you will be writing.
 
-When using [`write`](#write) the key parameter isn't checked duplicates resulting in writing it 
+When using [`write`](#write) the key parameter isn't checked duplicates resulting in writing it
 out again to the stream. Bear in mind that while `PHP` considers this perfectly valid `JSON`, the
-[`JSON` spec](https://tools.ietf.org/html/rfc7159) doesn't specify a behavior for this. So your 
-milage might vary, as described in [section 4](https://tools.ietf.org/html/rfc7159#section-4) of 
+[`JSON` spec](https://tools.ietf.org/html/rfc7159) doesn't specify a behavior for this. So your
+milage might vary, as described in [section 4](https://tools.ietf.org/html/rfc7159#section-4) of
 RFC7159, in `PHP`'s case it will only use the value from the last occurrence.
 
 ### Factories ###
 
-This package ships with a factory containing factory methods for arrays `JsonStreamFactory::createFromArray` and 
-observables `JsonStreamFactory::createFromObservable`. Both will create a few stream, pause it, write the 
+This package ships with a factory containing factory methods for arrays `JsonStreamFactory::createFromArray` and
+observables `JsonStreamFactory::createFromObservable`. Both will create a few stream, pause it, write the
 array/observable to it, and end it.
 
 ## Contributing ##
