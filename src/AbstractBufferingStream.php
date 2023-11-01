@@ -19,17 +19,13 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
         $this->stream->on('close', [$this, 'onClose']);
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     final public function onData(string $data): void
     {
         $this->buffer .= $data;
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     final public function onClose(): void
     {
         $this->isDone = true;

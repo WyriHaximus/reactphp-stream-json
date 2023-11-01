@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\Stream\Json;
 
 use React\EventLoop\Loop;
+use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Stream\ThroughStream;
 use Rx\Observable;
@@ -16,6 +17,7 @@ use WyriHaximus\React\Stream\Json\JsonStream;
 use function json_decode;
 use function json_last_error;
 use function range;
+use function React\Async\await;
 use function React\Promise\all;
 use function React\Promise\resolve;
 use function React\Promise\Stream\buffer;
@@ -24,14 +26,9 @@ use function WyriHaximus\React\timedPromise;
 use const JSON_ERROR_NONE;
 use const JSON_ERROR_SYNTAX;
 
-/**
- * @internal
- */
 final class JsonStreamTest extends AsyncTestCase
 {
-    /**
-     * @return iterable<array<callable>>
-     */
+    /** @return iterable<array<callable>> */
     public function provideJSONs(): iterable
     {
         yield [
@@ -537,9 +534,7 @@ final class JsonStreamTest extends AsyncTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideJSONs
-     */
+    /** @dataProvider provideJSONs */
     public function testStream(callable $args): void
     {
         [$input, $output] = $args();
@@ -561,7 +556,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end($input);
         });
 
-        $buffer = $this->await(buffer($throughStream), 6);
+        $buffer = await(buffer($throughStream));
 
         self::assertSame($output, $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -578,7 +573,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end(['<\'&"&\'>']);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('["<\'&\"&\'>"]', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -595,7 +590,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end([false]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{true,false}', $buffer);
         json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -610,7 +605,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end([true, false]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('[true,false]', $buffer);
         json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -625,7 +620,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end([true, false]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('[true,false]', $buffer);
         json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -640,7 +635,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end(['a' => true, 'b' => false]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('["a":true,"b":false]', $buffer);
         json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -655,7 +650,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end(['a' => true, 'b' => false]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true,"b":false}', $buffer);
         json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -670,7 +665,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end([true, false]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{true,false}', $buffer);
         json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -687,7 +682,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end();
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true,"a":false}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -705,7 +700,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->write('b', false);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -723,7 +718,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->writeValue(false);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -741,7 +736,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->writeArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -759,7 +754,7 @@ final class JsonStreamTest extends AsyncTestCase
             $stream->end([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         });
 
-        $buffer = $this->await(buffer($stream), 6);
+        $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
         $json = json_decode($buffer, true); /** @phpstan-ignore-line */
@@ -828,8 +823,8 @@ final class JsonStreamTest extends AsyncTestCase
             ]);
         });
 
-        $i     = 0;
-        $timer = Loop::addPeriodicTimer(0.1, static function () use ($anotherStream, &$i, &$timer): void {
+        $i      = 0;
+        $timerA = Loop::addPeriodicTimer(0.1, static function () use ($anotherStream, &$i, &$timerA): void {
             $i++;
             $anotherStream->write((string) $i);
             if ($i <= 10) {
@@ -837,11 +832,16 @@ final class JsonStreamTest extends AsyncTestCase
             }
 
             $anotherStream->end();
-            Loop::cancelTimer($timer);
+
+            if (! ($timerA instanceof TimerInterface)) {
+                return;
+            }
+
+            Loop::cancelTimer($timerA);
         });
 
         $j      = 0;
-        $timer1 = Loop::addPeriodicTimer(0.01, static function () use ($anotherStream1, &$j, &$timer1): void {
+        $timerB = Loop::addPeriodicTimer(0.01, static function () use ($anotherStream1, &$j, &$timerB): void {
             $j++;
             $anotherStream1->write((string) ($j));
             if ($j <= 10) {
@@ -849,10 +849,15 @@ final class JsonStreamTest extends AsyncTestCase
             }
 
             $anotherStream1->end();
-            Loop::cancelTimer($timer1);
+
+            if (! ($timerB instanceof TimerInterface)) {
+                return;
+            }
+
+            Loop::cancelTimer($timerB);
         });
 
-        $buffer = $this->await(buffer($jsonStream), 2);
+        $buffer = await(buffer($jsonStream));
 
         self::assertSame('["first","1234567891011","1234567891011","third"]', $buffer);
     }

@@ -8,9 +8,6 @@ use React\Stream\ThroughStream;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\Stream\Json\BufferingReadableStream;
 
-/**
- * @internal
- */
 final class BufferingReadableStreamTest extends AsyncTestCase
 {
     public function testBuffering(): void

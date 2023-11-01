@@ -8,9 +8,7 @@ use Rx\ObservableInterface;
 
 final class JsonStreamFactory
 {
-    /**
-     * @param array<mixed> $values
-     */
+    /** @param array<mixed> $values */
     public static function createFromArray(array $values, int $encodeFlags = JsonStream::DEFAULT_ENCODE_FLAGS): JsonStream
     {
         $stream = new JsonStream($encodeFlags);
