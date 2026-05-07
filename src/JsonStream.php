@@ -30,11 +30,11 @@ use const JSON_PRESERVE_ZERO_FRACTION;
 
 final class JsonStream extends EventEmitter implements ReadableStreamInterface
 {
-    public const OBJECT_BEGINNING     = '{';
-    public const OBJECT_ENDING        = '}';
-    public const ARRAY_BEGINNING      = '[';
-    public const ARRAY_ENDING         = ']';
-    public const DEFAULT_ENCODE_FLAGS = JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_PRESERVE_ZERO_FRACTION;
+    public const string OBJECT_BEGINNING  = '{';
+    public const string OBJECT_ENDING     = '}';
+    public const string ARRAY_BEGINNING   = '[';
+    public const string ARRAY_ENDING      = ']';
+    public const int DEFAULT_ENCODE_FLAGS = JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_PRESERVE_ZERO_FRACTION;
 
     /** @var SplQueue<array{id: int, key: string|null, value: mixed}> */
     private SplQueue $queue;

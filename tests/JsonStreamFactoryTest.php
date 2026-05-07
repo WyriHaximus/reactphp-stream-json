@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\Stream\Json;
 
 use React\EventLoop\Loop;
+use Rx\Observable;
+use Rx\ObservableFactoryWrapper;
+use Rx\Scheduler\ImmediateScheduler;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\Stream\Json\JsonStreamFactory;
 
-use function ApiClients\Tools\Rx\observableFromArray;
 use function React\Async\await;
 use function React\Promise\Stream\buffer;
 
@@ -39,7 +41,7 @@ final class JsonStreamFactoryTest extends AsyncTestCase
             'buffalo',
         ];
 
-        $stream = JsonStreamFactory::createFromObservable(observableFromArray($array));
+        $stream = JsonStreamFactory::createFromObservable(Observable::fromArray($array, new ImmediateScheduler()));
         Loop::futureTick(static function () use ($stream): void {
             $stream->resume();
         });
