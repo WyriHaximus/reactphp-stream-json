@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\Stream\Json;
 
+use PHPUnit\Framework\Attributes\Test;
 use React\EventLoop\Loop;
 use Rx\Observable;
-use Rx\ObservableFactoryWrapper;
 use Rx\Scheduler\ImmediateScheduler;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\Stream\Json\JsonStreamFactory;
@@ -16,7 +16,7 @@ use function React\Promise\Stream\buffer;
 
 final class JsonStreamFactoryTest extends AsyncTestCase
 {
-    /** @test */
+    #[Test]
     public function createFromArray(): void
     {
         $array = [
@@ -33,7 +33,7 @@ final class JsonStreamFactoryTest extends AsyncTestCase
         self::assertSame('["cuvee","buffalo"]', $json);
     }
 
-    /** @test */
+    #[Test]
     public function createFromObservavle(): void
     {
         $array = [

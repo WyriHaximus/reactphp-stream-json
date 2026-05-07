@@ -6,6 +6,7 @@ namespace WyriHaximus\React\Stream\Json;
 
 use Rx\ObservableInterface;
 
+/** @api */
 final class JsonStreamFactory
 {
     /** @param array<mixed> $values */

@@ -11,23 +11,29 @@ use React\Promise\PromiseInterface;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
+use RuntimeException;
 use Rx\Observable;
 use Rx\ObservableInterface;
 use SplQueue;
 
 use function array_keys;
+use function gettype;
 use function is_array;
 use function is_string;
+use function json_encode;
+use function json_last_error;
+use function json_last_error_msg;
 use function React\Promise\resolve;
-use function Safe\json_encode;
 use function trim;
 
+use const JSON_ERROR_NONE;
 use const JSON_HEX_AMP;
 use const JSON_HEX_APOS;
 use const JSON_HEX_QUOT;
 use const JSON_HEX_TAG;
 use const JSON_PRESERVE_ZERO_FRACTION;
 
+/** @api */
 final class JsonStream extends EventEmitter implements ReadableStreamInterface
 {
     public const string OBJECT_BEGINNING  = '{';
@@ -37,7 +43,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     public const int DEFAULT_ENCODE_FLAGS = JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_PRESERVE_ZERO_FRACTION;
 
     /** @var SplQueue<array{id: int, key: string|null, value: mixed}> */
-    private SplQueue $queue;
+    private readonly SplQueue $queue;
     private int|null $currentId = null;
     private bool $closing       = false;
     private bool $first         = true;
@@ -49,10 +55,9 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     private bool $paused        = false;
     private string $buffer      = '';
 
-    /** @phpstan-ignore-next-line */
-    public function __construct(private int $encodeFlags = self::DEFAULT_ENCODE_FLAGS)
+    /** @phpstan-ignore ergebnis.noConstructorParameterWithDefaultValue */
+    public function __construct(private readonly int $encodeFlags = self::DEFAULT_ENCODE_FLAGS)
     {
-        /** @psalm-suppress MixedPropertyTypeCoercion */
         $this->queue = new SplQueue();
     }
 
@@ -82,7 +87,6 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $id = $this->i++;
 
-        /** @psalm-suppress MixedAssignment */
         $value = $this->wrapValue($value);
 
         $this->queue->enqueue([
@@ -102,7 +106,6 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $id = $this->i++;
 
-        /** @psalm-suppress MixedAssignment */
         $value = $this->wrapValue($value);
 
         $this->queue->enqueue([
@@ -128,7 +131,6 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $this->objectOrArray($values);
 
-        /** @psalm-suppress MixedAssignment */
         foreach ($values as $key => $value) {
             if (is_string($key)) {
                 $this->write($key, $value);
@@ -147,15 +149,17 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $this->objectOrArray([]);
 
-        /** @psalm-suppress MissingClosureParamType */
         $values->subscribe(
-            function ($value): void {
+            function (mixed $value): void {
                 $this->writeValue($value);
             },
         );
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @phpstan-ignore shipmonk.missingNativeReturnTypehint,typeCoverage.returnTypeCoverage
+     */
     public function isReadable()
     {
         return $this->readable;
@@ -185,6 +189,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
      * @param array<mixed> $options
      *
      * @inheritDoc
+     * @phpstan-ignore shipmonk.missingNativeReturnTypehint,typeCoverage.returnTypeCoverage
      */
     public function pipe(WritableStreamInterface $dest, array $options = [])
     {
@@ -194,7 +199,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
     /**
      * @param array<mixed>|null $values
      *
-     * @phpstan-ignore-next-line
+     * @phpstan-ignore ergebnis.noParameterWithNullDefaultValue,ergebnis.noParameterWithNullableTypeDeclaration
      */
     public function end(array|null $values = null): void
     {
@@ -211,7 +216,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
     public function close(): void
     {
-        if ($this->closing === true) {
+        if ($this->closing) {
             return;
         }
 
@@ -279,11 +284,7 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             $this->emitData($this->encode($item['key']) . ':');
         }
 
-        /**
-         * @phpstan-ignore-next-line
-         * @psalm-suppress UndefinedInterfaceMethod
-         */
-        $this->formatValue($item['value'])->done(function (): void {
+        $this->formatValue($item['value'])->then(function (): void {
             $this->currentId = null;
             $this->nextItem();
         });
@@ -314,11 +315,11 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         return $value;
     }
 
+    /** @return PromiseInterface<bool> */
     private function formatValue(mixed $value): PromiseInterface
     {
         if ($value instanceof PromiseInterface) {
-            /** @psalm-suppress MissingClosureParamType */
-            return $value->then(fn ($result) => $this->formatValue(
+            return $value->then(fn (mixed $result): PromiseInterface => $this->formatValue(
                 $this->wrapValue($result),
             ));
         }
@@ -337,18 +338,19 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
 
         $this->emitData($this->encode($value));
 
-        return resolve();
+        return resolve(true);
     }
 
+    /** @return PromiseInterface<bool> */
     private function handleObservable(Observable $value): PromiseInterface
     {
         $this->emitData('[');
         $first = true;
 
+        /** @phpstan-ignore return.type */
         return new Promise(function (callable $resolve) use ($value, &$first): void {
-            /** @psalm-suppress MissingClosureParamType */
-            $value->flatMap(fn ($value) => Observable::fromPromise(resolve($this->wrapValue($value))))->subscribe(
-                function ($item) use (&$first): void {
+            $value->flatMap(fn (mixed $value): Observable => Observable::fromPromise(resolve($this->wrapValue($value))))->subscribe(
+                function (mixed $item) use (&$first): void {
                     if ($first === false) {
                         $this->emitData(',');
                     }
@@ -360,12 +362,13 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
                 null,
                 function () use ($resolve): void {
                     $this->emitData(']');
-                    $resolve();
+                    $resolve(true);
                 },
             );
         });
     }
 
+    /** @return PromiseInterface<bool> */
     private function handleJsonStream(BufferingStreamInterface $bufferingStream): PromiseInterface
     {
         $isDone = $bufferingStream->isDone();
@@ -373,21 +376,22 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         $buffer = $bufferingStream->takeOverBuffer();
         $this->emitData($buffer);
         if ($isDone) {
-            return resolve();
+            return resolve(true);
         }
 
-        /** @psalm-suppress MissingClosureParamType */
         $stream->on('data', function (string $data): void {
             $this->emitData($data);
         });
+        /** @var Deferred<bool> $deferred */
         $deferred = new Deferred();
         $stream->once('close', static function () use ($deferred): void {
-            $deferred->resolve();
+            $deferred->resolve(true);
         });
 
         return $deferred->promise();
     }
 
+    /** @return PromiseInterface<bool> */
     private function handleStream(BufferingStreamInterface $bufferingStream): PromiseInterface
     {
         $isDone = $bufferingStream->isDone();
@@ -398,17 +402,17 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
         if ($isDone) {
             $this->emitData('"');
 
-            return resolve();
+            return resolve(true);
         }
 
-        /** @psalm-suppress MissingClosureParamType */
-        $stream->on('data', function ($data): void {
+        $stream->on('data', function (mixed $data): void {
             $this->emitData($this->encode($data, true));
         });
+        /** @var Deferred<bool> $deferred */
         $deferred = new Deferred();
         $stream->once('close', function () use ($deferred): void {
             $this->emitData('"');
-            $deferred->resolve();
+            $deferred->resolve(true);
         });
 
         return $deferred->promise();
@@ -431,6 +435,14 @@ final class JsonStream extends EventEmitter implements ReadableStreamInterface
             $value,
             $this->encodeFlags,
         );
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException(json_last_error_msg());
+        }
+
+        if (! is_string($json)) {
+            throw new RuntimeException('Expected a JSON string, got: ' . gettype($json));
+        }
 
         if ($stripWrappingQuotes === false) {
             return $json;
