@@ -1,10 +1,11 @@
 parameters:
-	checkGenericClassInNonGenericObjectType: false
+	level: max
+	paths:
+		- ../../etc
+		- ../../src
+		- ../../tests
 	ergebnis:
 		noExtends:
 			classesAllowedToBeExtended:
 				- WyriHaximus\React\Stream\Json\AbstractBufferingStream
 				- Evenement\EventEmitter
-
-includes:
-	- ../../vendor/wyrihaximus/async-test-utilities/rules.neon

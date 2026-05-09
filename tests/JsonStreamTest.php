@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\Stream\Json;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use React\EventLoop\Loop;
 use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Stream\ThroughStream;
 use Rx\Observable;
 use Rx\ObservableInterface;
+use Rx\Scheduler\ImmediateScheduler;
 use Rx\Subject\Subject;
+use Throwable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\Stream\Json\JsonStream;
 
-use function json_decode;
-use function json_last_error;
 use function range;
 use function React\Async\await;
 use function React\Promise\all;
@@ -23,13 +25,10 @@ use function React\Promise\resolve;
 use function React\Promise\Stream\buffer;
 use function WyriHaximus\React\timedPromise;
 
-use const JSON_ERROR_NONE;
-use const JSON_ERROR_SYNTAX;
-
 final class JsonStreamTest extends AsyncTestCase
 {
-    /** @return iterable<array<callable>> */
-    public function provideJSONs(): iterable
+    /** @return iterable<array<callable():array{0: ObservableInterface|array<mixed>, 1: string}>> */
+    public static function provideJSONs(): iterable
     {
         yield [
             static function (): array {
@@ -216,7 +215,7 @@ final class JsonStreamTest extends AsyncTestCase
                     'melody' => $streamB,
                     'from' => $deferred->promise(),
                     'vortex' => $jsonStream,
-                    'timestream' => Observable::fromArray(['don\'t', 'blink']),
+                    'timestream' => Observable::fromArray(['don\'t', 'blink'], new ImmediateScheduler()),
                 ];
 
                 Loop::addTimer(0.1, static function () use ($streamA): void {
@@ -438,7 +437,7 @@ final class JsonStreamTest extends AsyncTestCase
         yield [
             static function (): array {
                 $input = [
-                    '😱' => Observable::fromArray(['foo', 'bar']),
+                    '😱' => Observable::fromArray(['foo', 'bar'], new ImmediateScheduler()),
                 ];
 
                 return [$input, '{"\ud83d\ude31":["foo","bar"]}'];
@@ -447,7 +446,7 @@ final class JsonStreamTest extends AsyncTestCase
 
         yield [
             static function (): array {
-                $input = Observable::fromArray(['foo', 'bar']);
+                $input = Observable::fromArray(['foo', 'bar'], new ImmediateScheduler());
 
                 return [$input, '["foo","bar"]'];
             },
@@ -455,7 +454,7 @@ final class JsonStreamTest extends AsyncTestCase
 
         yield [
             static function (): array {
-                $input = Observable::fromArray([resolve('foo'), timedPromise(0.3, 'bar')]);
+                $input = Observable::fromArray([resolve('foo'), timedPromise(0.3, 'bar')], new ImmediateScheduler());
 
                 return [$input, '["foo","bar"]'];
             },
@@ -480,7 +479,7 @@ final class JsonStreamTest extends AsyncTestCase
                         'from' => $deferred->promise(),
                         'vortex' => $jsonStream,
                     ],
-                ]);
+                ], new ImmediateScheduler());
 
                     Loop::addTimer(0.1, static function () use ($streamA): void {
                         $streamA->end('song');
@@ -526,7 +525,7 @@ final class JsonStreamTest extends AsyncTestCase
         yield [
             static function (): array {
                 $input = [
-                    'data' => Observable::fromArray([timedPromise(0.1, 'foo'), timedPromise(0.3, 'bar')]),
+                    'data' => Observable::fromArray([timedPromise(0.1, 'foo'), timedPromise(0.3, 'bar')], new ImmediateScheduler()),
                 ];
 
                 return [$input, '{"data":["foo","bar"]}'];
@@ -534,8 +533,14 @@ final class JsonStreamTest extends AsyncTestCase
         ];
     }
 
-    /** @dataProvider provideJSONs */
-    public function testStream(callable $args): void
+    /**
+     * @param callable():array{0: ObservableInterface|array<mixed>, 1: string} $args
+     *
+     * @throws Throwable
+     */
+    #[DataProvider('provideJSONs')]
+    #[Test]
+    public function stream(callable $args): void
     {
         [$input, $output] = $args();
 
@@ -559,13 +564,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($throughStream));
 
         self::assertSame($output, $buffer);
-        $json = json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertIsArray($json);
-        self::assertSame(json_decode($output, true), $json); /** @phpstan-ignore-line */
     }
 
-    public function testEncodeFlags(): void
+    #[Test]
+    public function encodeFlags(): void
     {
         $stream = new JsonStream(0);
 
@@ -576,12 +578,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('["<\'&\"&\'>"]', $buffer);
-        $json = json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['<\'&"&\'>'], $json); /** @phpstan-ignore-line */
     }
 
-    public function testObjectOrArrayObject(): void
+    #[Test]
+    public function objectOrArrayObject(): void
     {
         $stream = new JsonStream();
 
@@ -593,11 +593,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{true,false}', $buffer);
-        json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
     }
 
-    public function testObjectOrArrayArray(): void
+    #[Test]
+    public function objectOrArrayArray(): void
     {
         $stream = new JsonStream();
 
@@ -608,11 +607,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('[true,false]', $buffer);
-        json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
-    public function testForceArray(): void
+    #[Test]
+    public function forceArray(): void
     {
         $stream = JsonStream::createArray();
 
@@ -623,11 +621,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('[true,false]', $buffer);
-        json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
-    public function testForceArrayWhileWeWriteAnObject(): void
+    #[Test]
+    public function forceArrayWhileWeWriteAnObject(): void
     {
         $stream = JsonStream::createArray();
 
@@ -638,11 +635,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('["a":true,"b":false]', $buffer);
-        json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
     }
 
-    public function testForceObject(): void
+    #[Test]
+    public function forceObject(): void
     {
         $stream = JsonStream::createObject();
 
@@ -653,11 +649,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true,"b":false}', $buffer);
-        json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
-    public function testForceObjectWhileWeWriteAnArray(): void
+    #[Test]
+    public function forceObjectWhileWeWriteAnArray(): void
     {
         $stream = JsonStream::createObject();
 
@@ -668,11 +663,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{true,false}', $buffer);
-        json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_SYNTAX, json_last_error());
     }
 
-    public function testDoubleKeys(): void
+    #[Test]
+    public function doubleKeys(): void
     {
         $stream = JsonStream::createObject();
 
@@ -685,12 +679,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true,"a":false}', $buffer);
-        $json = json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => false], $json); /** @phpstan-ignore-line */
     }
 
-    public function testNoMoreWriteAfterEnd(): void
+    #[Test]
+    public function noMoreWriteAfterEnd(): void
     {
         $stream = JsonStream::createObject();
 
@@ -703,12 +695,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
-    public function testNoMoreWriteValueAfterEnd(): void
+    #[Test]
+    public function noMoreWriteValueAfterEnd(): void
     {
         $stream = JsonStream::createObject();
 
@@ -721,12 +711,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
-    public function testNoMoreWriteArrayAfterEnd(): void
+    #[Test]
+    public function noMoreWriteArrayAfterEnd(): void
     {
         $stream = JsonStream::createObject();
 
@@ -739,12 +727,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
-    public function testNoMoreEndAfterEnd(): void
+    #[Test]
+    public function noMoreEndAfterEnd(): void
     {
         $stream = JsonStream::createObject();
 
@@ -757,12 +743,10 @@ final class JsonStreamTest extends AsyncTestCase
         $buffer = await(buffer($stream));
 
         self::assertSame('{"a":true}', $buffer);
-        $json = json_decode($buffer, true); /** @phpstan-ignore-line */
-        self::assertSame(JSON_ERROR_NONE, json_last_error());
-        self::assertSame(['a' => true], $json); /** @phpstan-ignore-line */
     }
 
-    public function testPauseResume(): void
+    #[Test]
+    public function pauseResume(): void
     {
         $stream = JsonStream::createObject();
 
@@ -783,32 +767,43 @@ final class JsonStreamTest extends AsyncTestCase
 
         $stream->write('key', 'value');
 
-        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
-        self::assertSame(0, $shouldBeCalledCount); /** @phpstan-ignore-line */
+        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
+        self::assertSame(0, $shouldntBeCalledCount);
+        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
+        self::assertSame(0, $shouldBeCalledCount);
 
         $stream->removeListener('data', $shouldntBeCalled);
         $stream->on('data', $shouldBeCalled);
 
-        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
-        self::assertSame(0, $shouldBeCalledCount); /** @phpstan-ignore-line */
+        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
+        self::assertSame(0, $shouldntBeCalledCount);
+        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
+        self::assertSame(0, $shouldBeCalledCount);
 
         $stream->resume();
 
-        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
-        self::assertSame(1, $shouldBeCalledCount); /** @phpstan-ignore-line */
+        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
+        self::assertSame(0, $shouldntBeCalledCount);
+        /** @phpstan-ignore staticMethod.impossibleType */
+        self::assertSame(1, $shouldBeCalledCount);
 
         $stream->write('key', 'value');
 
-        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
+        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
+        self::assertSame(0, $shouldntBeCalledCount);
+        /** @phpstan-ignore staticMethod.impossibleType */
         self::assertSame(4, $shouldBeCalledCount);
 
         $stream->end();
 
-        self::assertSame(0, $shouldntBeCalledCount); /** @phpstan-ignore-line */
+        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
+        self::assertSame(0, $shouldntBeCalledCount);
+        /** @phpstan-ignore staticMethod.impossibleType */
         self::assertSame(5, $shouldBeCalledCount);
     }
 
-    public function testDoubleResolveStream(): void
+    #[Test]
+    public function doubleResolveStream(): void
     {
         $jsonStream     = new JsonStream();
         $anotherStream  = new ThroughStream();
