@@ -14,7 +14,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $loop       = Factory::create();
 $buffer     = '';
 $jsonStream = new JsonStream();
-$jsonStream->on('data', static function ($data) use (&$buffer): void {
+$jsonStream->on('data', static function (string $data) use (&$buffer): void {
     $buffer .= $data;
     echo $data;
 });
