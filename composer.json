@@ -19,7 +19,7 @@
   "require-dev": {
     "react/promise-stream": "^1.7",
     "wyrihaximus/async-test-utilities": "^13.2.0",
-    "wyrihaximus/makefiles": "^0.11.1",
+    "wyrihaximus/makefiles": "^0.12.0",
     "wyrihaximus/ticking-promise": "^3.2.0"
   },
   "autoload": {
