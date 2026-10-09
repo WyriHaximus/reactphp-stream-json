@@ -50,4 +50,37 @@ final class BufferingReadableStreamTest extends AsyncTestCase
         $stream->end('b');
         self::assertTrue($bufferingStream->isDone());
     }
+
+    #[Test]
+    public function onDataAndOnCloseHandlers(): void
+    {
+        $stream          = new ThroughStream();
+        $bufferingStream = new BufferingReadableStream($stream);
+
+        self::assertFalse($bufferingStream->isDone());
+
+        $bufferingStream->onData('buffered');
+        self::assertSame('buffered', $bufferingStream->takeOverBuffer());
+
+        $bufferingStream->onClose();
+        self::assertTrue($bufferingStream->isDone());
+    }
+
+    #[Test]
+    public function takeOverStreamStopsBufferingAndDetachesListeners(): void
+    {
+        $stream          = new ThroughStream();
+        $bufferingStream = new BufferingReadableStream($stream);
+
+        self::assertNotSame([], $stream->listeners('data'));
+        self::assertNotSame([], $stream->listeners('close'));
+
+        $bufferingStream->takeOverStream();
+
+        self::assertSame([], $stream->listeners('data'));
+        self::assertSame([], $stream->listeners('close'));
+
+        $stream->write('after-takeover');
+        self::assertSame('', $bufferingStream->takeOverBuffer());
+    }
 }
