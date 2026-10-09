@@ -10,7 +10,7 @@ use function Clue\React\Block\await;
 use function React\Promise\resolve;
 use function React\Promise\Stream\buffer;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $loop       = Factory::create();
 $jsonStream = new JsonStream();

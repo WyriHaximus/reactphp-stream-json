@@ -9,7 +9,7 @@ use WyriHaximus\React\Stream\Json\JsonStream;
 
 use function React\Promise\resolve;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $loop       = Factory::create();
 $buffer     = '';
