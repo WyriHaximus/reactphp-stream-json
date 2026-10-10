@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Stream\Json;
 
+use Closure;
 use React\Stream\ReadableStreamInterface;
 
 abstract class AbstractBufferingStream implements BufferingStreamInterface
@@ -11,12 +12,16 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
     private ReadableStreamInterface $stream;
     private string $buffer = '';
     private bool $isDone   = false;
+    private Closure $onDataListener;
+    private Closure $onCloseListener;
 
     final protected function setUp(ReadableStreamInterface $stream): void
     {
-        $this->stream = $stream;
-        $this->stream->on('data', $this->onData(...));
-        $this->stream->on('close', $this->onClose(...));
+        $this->stream          = $stream;
+        $this->onDataListener  = $this->onData(...);
+        $this->onCloseListener = $this->onClose(...);
+        $this->stream->on('data', $this->onDataListener);
+        $this->stream->on('close', $this->onCloseListener);
     }
 
     final public function onData(string $data): void
@@ -31,8 +36,8 @@ abstract class AbstractBufferingStream implements BufferingStreamInterface
 
     final public function takeOverStream(): ReadableStreamInterface
     {
-        $this->stream->removeListener('data', $this->onData(...));
-        $this->stream->removeListener('close', $this->onClose(...));
+        $this->stream->removeListener('data', $this->onDataListener);
+        $this->stream->removeListener('close', $this->onCloseListener);
         $this->isDone = true;
 
         return $this->stream;

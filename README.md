@@ -6,7 +6,7 @@
 [![Type Coverage](https://shepherd.dev/github/WyriHaximus/reactphp-stream-json/coverage.svg)](https://shepherd.dev/github/WyriHaximus/reactphp-stream-json)
 [![License](https://poser.pugx.org/wyrihaximus/react-stream-json/license.png)](https://packagist.org/packages/wyrihaximus/react-stream-json)
 
-### Installation ###
+## Installation
 
 To install via [Composer](http://getcomposer.org/), use the command below, it will automatically detect the latest version and bind it with `^`.
 
@@ -14,7 +14,7 @@ To install via [Composer](http://getcomposer.org/), use the command below, it wi
 composer require wyrihaximus/react-stream-json
 ```
 
-### Usage ###
+## Usage
 
 The `JsonStream` implements the `ReadableStreamInterface` from `react/stream` and behaves like the `ThroughStream`, the moment you `write*` to it, it will emit data.
 
@@ -51,38 +51,38 @@ $anotherStream->end('second');
 Stream contents will be:
 `{"key":"value","promise":"value","stream":"stream contents","nested":{"a":"b","c":"d"},"nested_promises":["first","second"],"nested_mixed":["first","second","third"]}`
 
-### Methods ###
+## Methods
 
 All the following methods try to resolve `$value`, when it encounters a promise it will wait for the promise
 to resolve, and when it encounters a stream it will forward the stream's contents to it's own listeners.
 Promises can resolve to a stream but not vise versa. Any other parameters will be run though `json_encode`,
 except for arrays, those will be searched through for promises and streams.
 
-##### write #####
+### write
 
 `write(string $key, $value)` accepts a key and a value as argument. Writing a new key and value pair to the stream.
 
-##### writeValue #####
+### writeValue
 
 `write($value)` accepts only a value as argument. Writing the value pair to the stream.
 
-##### writeArray #####
+### writeArray
 
 `writeArray(array $values)` will iterate over the items in the array and call `write` or `writeValue` depending on
 the type of the key.
 
-##### writeObservable #####
+### writeObservable
 
 `writeObservable(ObservableInterface $values)` will subscribe to the observable and call `writeValue` on each item
 coming in.
 
-##### end #####
+### end
 
 `end(array $values = [])` will call `writeArray` when `$values` contains something and then or otherwise
 end the stream. At that point no new values are accepted and it continues to operate any outstanding promises or streams
 have been resolve/completed.
 
-### Caveats ###
+## Caveats
 
 The stream doesn't know if you want to write an object or an array so it assumes an object.
 It does try to detect when you haven't written anything yet and call `writeArray` or `end`
@@ -93,21 +93,21 @@ know what kind of `JSON` you will be writing.
 
 When using [`write`](#write) the key parameter isn't checked duplicates resulting in writing it
 out again to the stream. Bear in mind that while `PHP` considers this perfectly valid `JSON`, the
-[`JSON` spec](https://tools.ietf.org/html/rfc7159) doesn't specify a behavior for this. So your
-milage might vary, as described in [section 4](https://tools.ietf.org/html/rfc7159#section-4) of
-RFC7159, in `PHP`'s case it will only use the value from the last occurrence.
+[`JSON` spec](https://tools.ietf.org/html/rfc7159) doesn't specify a behavior for this. Your
+mileage might vary; see [JSON values in RFC 7159](https://tools.ietf.org/html/rfc7159#section-4).
+In `PHP`'s case it will only use the value from the last occurrence.
 
-### Factories ###
+## Factories
 
 This package ships with a factory containing factory methods for arrays `JsonStreamFactory::createFromArray` and
 observables `JsonStreamFactory::createFromObservable`. Both will create a few stream, pause it, write the
 array/observable to it, and end it.
 
-## Contributing ##
+## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## License ##
+## License
 
 Copyright 2026 [Cees-Jan Kiewiet](http://wyrihaximus.net/)
 

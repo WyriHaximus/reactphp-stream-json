@@ -750,56 +750,52 @@ final class JsonStreamTest extends AsyncTestCase
     {
         $stream = JsonStream::createObject();
 
-        $shouldntBeCalledCount = 0;
-        $shouldntBeCalled      = static function () use (&$shouldntBeCalledCount): void {
-            $shouldntBeCalledCount++;
+        /** @var list<int> $ignored */
+        $ignored          = [];
+        $shouldntBeCalled = static function () use (&$ignored): void {
+            $ignored[] = 1;
         };
-        $shouldBeCalledCount   = 0;
-        $shouldBeCalled        = static function () use (&$shouldBeCalledCount): void {
-            $shouldBeCalledCount++;
+        /** @var list<int> $emitted */
+        $emitted        = [];
+        $shouldBeCalled = static function () use (&$emitted): void {
+            $emitted[] = 1;
         };
 
-        self::assertSame(0, $shouldntBeCalledCount);
-        self::assertSame(0, $shouldBeCalledCount);
+        self::assertCount(0, $ignored);
+        self::assertCount(0, $emitted);
 
         $stream->on('data', $shouldntBeCalled);
         $stream->pause();
 
         $stream->write('key', 'value');
 
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertSame(0, $shouldntBeCalledCount);
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertSame(0, $shouldBeCalledCount);
+        self::assertCount(0, $ignored);
+        self::assertCount(0, $emitted);
 
         $stream->removeListener('data', $shouldntBeCalled);
         $stream->on('data', $shouldBeCalled);
 
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertSame(0, $shouldntBeCalledCount);
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertSame(0, $shouldBeCalledCount);
+        self::assertCount(0, $ignored);
+        self::assertCount(0, $emitted);
 
         $stream->resume();
 
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertSame(0, $shouldntBeCalledCount);
-        /** @phpstan-ignore staticMethod.impossibleType */
-        self::assertSame(1, $shouldBeCalledCount);
+        self::assertCount(0, $ignored);
+        self::assertCount(1, $emitted);
 
         $stream->write('key', 'value');
 
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertSame(0, $shouldntBeCalledCount);
-        /** @phpstan-ignore staticMethod.impossibleType */
-        self::assertSame(4, $shouldBeCalledCount);
+        self::assertCount(0, $ignored);
+        /** @phpstan-ignore wyrihaximus.reactphp.eventLoop.passLoopInterface */
+        self::assertCount(4, $emitted);
 
         $stream->end();
 
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertSame(0, $shouldntBeCalledCount);
-        /** @phpstan-ignore staticMethod.impossibleType */
-        self::assertSame(5, $shouldBeCalledCount);
+        self::assertCount(0, $ignored);
+        /** @phpstan-ignore wyrihaximus.reactphp.eventLoop.passLoopInterface */
+        self::assertCount(5, $emitted);
+
+        $stream->close();
     }
 
     #[Test]
