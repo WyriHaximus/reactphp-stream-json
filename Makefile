@@ -37,12 +37,6 @@ else
     IN_CI=FALSE
 endif
 
-ifeq ("$(IN_CI)","TRUE")
-    MUTATION_THREADS?=1
-else
-    MUTATION_THREADS?=$(THREADS)
-endif
-
 ifeq ("$(IN_DOCKER)","TRUE")
 	DOCKER_RUN:=
 	DOCKER_RUN_WITHOUT_NETWORK_FOR_COMPOSER:=
@@ -55,7 +49,7 @@ else
     ifeq ($(DOCKER_AVAILABLE),0)
         DOCKER_DEFAULT_SECURITY_OPS=--cap-drop=ALL --security-opt="no-new-privileges=true" --user="`id -u`:`id -g`"
         DOCKER_WORKSPACE_BIND_OPS=-v "`pwd`:`pwd`" -w "`pwd`"
-        DOCKER_COMMON_OPS:=-v "`pwd`:`pwd`" -w "`pwd`" -v "`pwd`/.git:`pwd`/.git:ro" -v "${COMPOSER_CACHE_DIR}:${COMPOSER_CONTAINER_CACHE_DIR}" --ulimit nofile=1000000 -e THREADS="${THREADS}" -e MUTATION_THREADS="${MUTATION_THREADS}" -e OTEL_PHP_DISABLED_INSTRUMENTATIONS="all"
+        DOCKER_COMMON_OPS:=-v "`pwd`:`pwd`" -w "`pwd`" -v "`pwd`/.git:`pwd`/.git:ro" -v "${COMPOSER_CACHE_DIR}:${COMPOSER_CONTAINER_CACHE_DIR}" --ulimit nofile=1000000 -e THREADS="${THREADS}" -e OTEL_PHP_DISABLED_INSTRUMENTATIONS="all"
         ifneq ("$(wildcard etc/qa/zzz_disable_otel_attr_hooks.ini)","")
             DOCKER_COMMON_OPS:=${DOCKER_COMMON_OPS} -v "`pwd`/etc/qa/zzz_disable_otel_attr_hooks.ini:/usr/local/etc/php/conf.d/zzz_disable_otel_attr_hooks.ini:ro"
         endif
@@ -96,6 +90,16 @@ else
         DOCKER_WORKSPACE_BIND_OPS=
     endif
 endif
+
+INFECTION_THREADS_DETECT=php -r '$$f="etc/qa/infection.json5"; if (!is_file($$f)) {echo "0"; exit;} $$j=json_decode(file_get_contents($$f), true); echo (is_array($$j) && array_key_exists("threads", $$j)) ? "1" : "0";'
+ifeq ("$(IN_DOCKER)","TRUE")
+    INFECTION_CONFIG_HAS_THREADS=$(shell $(INFECTION_THREADS_DETECT))
+else ifneq ($(strip $(DOCKER_RUN)),)
+    INFECTION_CONFIG_HAS_THREADS=$(shell $(DOCKER_RUN) $(INFECTION_THREADS_DETECT))
+else
+    INFECTION_CONFIG_HAS_THREADS=$(shell $(INFECTION_THREADS_DETECT))
+endif
+INFECTION_THREADS_CLI=$(if $(filter 1,$(INFECTION_CONFIG_HAS_THREADS)),,--threads=$(if $(filter TRUE,$(IN_CI)),1,$(THREADS)))
 
 DOCKER_RUN_DOCUMENTATION=docker run --rm -i $(DOCKER_DEFAULT_SECURITY_OPS) $(DOCKER_WORKSPACE_BIND_OPS)
 
@@ -550,10 +554,10 @@ coverage-guard-raw: ## Enforce code coverage rules ####
 	php vendor/bin/coverage-guard check ./var/phpunit/coverage/clover.xml --config=./etc/qa/coverage-guard.php
 
 mutation-testing: ## Run mutation testing ##*LCH*##^static-analysis|unit-tests^##
-	$(DOCKER_RUN_WITH_SOCKET) bash -ec 'rm -rf /tmp/phpstan var/phpunit/cache && vendor/bin/infection --ansi --log-verbosity=all --ignore-msi-with-no-mutations --configuration=./etc/qa/infection.json5 --static-analysis-tool=phpstan --static-analysis-tool-options="--memory-limit=-1" --threads=$(MUTATION_THREADS)'
+	$(DOCKER_RUN_WITH_SOCKET) bash -ec 'rm -rf /tmp/phpstan var/phpunit/cache && vendor/bin/infection --ansi --log-verbosity=all --ignore-msi-with-no-mutations --configuration=./etc/qa/infection.json5 --static-analysis-tool=phpstan --static-analysis-tool-options="--memory-limit=-1" $(INFECTION_THREADS_CLI)'
 
 mutation-testing-raw: ## Run mutation testing ####^static-analysis|unit-tests^##
-	bash -ec 'rm -rf /tmp/phpstan var/phpunit/cache && vendor/bin/infection --ansi --log-verbosity=all --ignore-msi-with-no-mutations --configuration=./etc/qa/infection.json5 --static-analysis-tool=phpstan --static-analysis-tool-options="--memory-limit=-1" --threads=$(MUTATION_THREADS)'
+	bash -ec 'rm -rf /tmp/phpstan var/phpunit/cache && vendor/bin/infection --ansi --log-verbosity=all --ignore-msi-with-no-mutations --configuration=./etc/qa/infection.json5 --static-analysis-tool=phpstan --static-analysis-tool-options="--memory-limit=-1" $(INFECTION_THREADS_CLI)'
 
 composer-require-checker: ## Ensure we require every package used in this package directly ##*EC*##^composer-dependency-checkers^##
 	$(DOCKER_SHELL) vendor/bin/composer-require-checker --ignore-parse-errors --ansi -vvv --config-file=./etc/qa/composer-require-checker.json
