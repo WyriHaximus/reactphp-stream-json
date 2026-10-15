@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77f732e549ebfac2fd7d73aeb56e6265",
+    "content-hash": "9e570e9d7cca119e61f68fc638f38680",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -9622,16 +9622,16 @@
         },
         {
             "name": "wyrihaximus/makefiles",
-            "version": "0.15.3",
+            "version": "0.15.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/Makefiles.git",
-                "reference": "54a86a9c31264dc81f964b97fb4155d27041bc9d"
+                "reference": "21be5310453805572de6592637df7905cefadb10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/Makefiles/zipball/54a86a9c31264dc81f964b97fb4155d27041bc9d",
-                "reference": "54a86a9c31264dc81f964b97fb4155d27041bc9d",
+                "url": "https://api.github.com/repos/WyriHaximus/Makefiles/zipball/21be5310453805572de6592637df7905cefadb10",
+                "reference": "21be5310453805572de6592637df7905cefadb10",
                 "shasum": ""
             },
             "require": {
@@ -9672,7 +9672,7 @@
             "description": "🧱 Makefile building blocks",
             "support": {
                 "issues": "https://github.com/WyriHaximus/Makefiles/issues",
-                "source": "https://github.com/WyriHaximus/Makefiles/tree/0.15.3"
+                "source": "https://github.com/WyriHaximus/Makefiles/tree/0.15.4"
             },
             "funding": [
                 {
@@ -9680,7 +9680,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-13T18:40:44+00:00"
+            "time": "2026-10-15T16:12:42+00:00"
         },
         {
             "name": "wyrihaximus/phpstan-no-safe",
