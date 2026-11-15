@@ -18,7 +18,7 @@ composer require wyrihaximus/react-stream-json
 
 The `JsonStream` implements the `ReadableStreamInterface` from `react/stream` and behaves like the `ThroughStream`, the moment you `write*` to it, it will emit data.
 
-The following example has a fixed number of items in the JSON and can be written to `end` with out needed a `write*` call.
+The following example sends a fixed number of JSON items to `end` without a `write*` call.
 
 ```php
 $stream = new ThroughStream();
@@ -55,8 +55,8 @@ Stream contents will be:
 
 All the following methods try to resolve `$value`, when it encounters a promise it will wait for the promise
 to resolve, and when it encounters a stream it will forward the stream's contents to it's own listeners.
-Promises can resolve to a stream but not vise versa. Any other parameters will be run though `json_encode`,
-except for arrays, those will be searched through for promises and streams.
+Promises can resolve to a stream but not vise versa. The stream passes other values to `json_encode`; for arrays,
+it searches for promises and streams.
 
 ### write
 
@@ -78,9 +78,9 @@ coming in.
 
 ### end
 
-`end(array $values = [])` will call `writeArray` when `$values` contains something and then or otherwise
-end the stream. At that point no new values are accepted and it continues to operate any outstanding promises or streams
-have been resolve/completed.
+`end(array $values = [])` will call `writeArray` when `$values` contains something, then end the stream.
+At that point, the stream stops accepting new values and continues to operate on outstanding promises or streams
+until they resolve or complete.
 
 ## Caveats
 
@@ -88,7 +88,7 @@ The stream doesn't know if you want to write an object or an array so it assumes
 It does try to detect when you haven't written anything yet and call `writeArray` or `end`
 with an array of items. You can force writing an array or object by calling `JsonStream::createArray`
 or `JsonStream::createObject` when creating an instance of `JsonStream`. Writing object items
-to a stream set up as array or vise versa will result in malformed `JSON`. In short you MUST
+to a stream set up as array or vise versa will result in malformed `JSON`. In short, you must
 know what kind of `JSON` you will be writing.
 
 When using [`write`](#write) the key parameter isn't checked duplicates resulting in writing it
@@ -105,12 +105,13 @@ array/observable to it, and end it.
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Please see the [contributing guide](CONTRIBUTING.md) for details.
 
 ## License
 
 Copyright 2026 [Cees-Jan Kiewiet](http://wyrihaximus.net/)
 
+<!-- vale write-good = NO -->
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
 files (the "Software"), to deal in the Software without
@@ -123,6 +124,7 @@ conditions:
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
+<!-- vale neighbor.AllCapsProse = NO -->
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -131,3 +133,5 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+<!-- vale neighbor.AllCapsProse = yes -->
+<!-- vale write-good = yes -->

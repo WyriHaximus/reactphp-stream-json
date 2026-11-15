@@ -359,6 +359,7 @@ SECONDS_PER_HOUR
 SECONDS_PER_MINUTE
 SECONDS_PER_WEEK
 SEPARATOR
+SHAs
 SQLite3
 SQLite3Exception
 SQLite3Result
@@ -401,6 +402,7 @@ StringValue
 Stringable
 Struct
 Syntax
+Testcontainers
 Text
 Throwable
 Timestamp
@@ -3765,6 +3767,9 @@ words
 wordwrap
 wrap
 write
+writeArray
+writeObservable
+writeValue
 write_error
 write_error_line
 write_line
